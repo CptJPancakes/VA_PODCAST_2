@@ -560,6 +560,19 @@ def run_pipeline(items_path=None):
     return data, selected_debug, stats
 
 
+def write_data(data, path=None):
+    """Write data.json. Writes to a temp file and renames over the target
+    (atomic on POSIX) so a crash or exception mid-write can never leave
+    data.json truncated — matters now that Refresh can trigger this write
+    from a live server, where the existing dashboard must survive a failed
+    run."""
+    path = Path(path) if path is not None else DATA_PATH
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp_path, "w", encoding="utf-8") as handle:
+        json.dump(data, handle, ensure_ascii=False, indent=2)
+    tmp_path.replace(path)
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -600,8 +613,7 @@ def main():
         print("--dry-run: data.json was NOT modified.")
         return
 
-    with open(DATA_PATH, "w", encoding="utf-8") as handle:
-        json.dump(data, handle, ensure_ascii=False, indent=2)
+    write_data(data)
     print(f"Wrote {DATA_PATH}")
 
 

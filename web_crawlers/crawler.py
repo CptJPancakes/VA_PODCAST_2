@@ -85,10 +85,15 @@ def load_items(path=None):
 
 
 def save_items(items, path=None):
-    path = path if path is not None else ITEMS_PATH
+    path = Path(path) if path is not None else ITEMS_PATH
     ordered = sorted(items, key=lambda item: item.get("published_at") or "", reverse=True)
-    with open(path, "w", encoding="utf-8") as handle:
+    # Write to a temp file and rename over the target (atomic on POSIX) so a
+    # crash or exception mid-write can never leave items.json truncated —
+    # matters now that Refresh can trigger this write from a live server.
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp_path, "w", encoding="utf-8") as handle:
         json.dump(ordered, handle, ensure_ascii=False, indent=2)
+    tmp_path.replace(path)
 
 
 # ---------------------------------------------------------------------------
@@ -329,12 +334,15 @@ def merge_items(existing_items, new_items):
 # ---------------------------------------------------------------------------
 
 def run_crawl(source_id=None, window_hours=WINDOW_HOURS):
+    """Returns a small summary dict of what happened (also used by
+    app.py's /api/refresh to log/report results) — callers that only care
+    about the printed CLI output (main() below) can simply ignore it."""
     sources = load_sources()
     if source_id:
         sources = [s for s in sources if s["id"] == source_id]
         if not sources:
             print(f"No source with id={source_id!r} in sources.json")
-            return
+            return {"attempted": 0, "succeeded": 0, "failed": 0, "added": 0, "refreshed": 0, "total_items": 0}
 
     existing_items = load_items()
     all_new_items = []
@@ -360,6 +368,15 @@ def run_crawl(source_id=None, window_hours=WINDOW_HOURS):
     print()
     print(f"sources attempted: {attempted}, succeeded: {succeeded}, failed: {failed}")
     print(f"new items: {added}, refreshed items: {refreshed}, total items in store: {len(merged_items)}")
+
+    return {
+        "attempted": attempted,
+        "succeeded": succeeded,
+        "failed": failed,
+        "added": added,
+        "refreshed": refreshed,
+        "total_items": len(merged_items),
+    }
 
 
 def run_audit():
