@@ -88,7 +88,7 @@ The dashboard expects this shape:
 
 ```json
 {
-  "updated_at": "2026-08-15T17:00:00",
+  "updated_at": "2026-08-15T21:00:00+00:00",
   "shenandoah_valley": {
     "real_estate": [],
     "community": [],

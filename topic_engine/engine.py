@@ -572,7 +572,7 @@ def run_pipeline(items_path=None, sources_path=None):
         if item.get("source_id") not in disabled_source_ids
     ]
 
-    data = {"updated_at": datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}
+    data = {"updated_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
     selected_debug = []
     stats = {
         "items_read": len(all_items),

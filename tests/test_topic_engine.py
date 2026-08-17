@@ -393,6 +393,7 @@ def test_output_matches_existing_gui_data_contract(tmp_path):
     data, _, _ = engine.run_pipeline(path)
 
     assert set(data.keys()) == {"updated_at", "shenandoah_valley", "northern_virginia"}
+    assert datetime.fromisoformat(data["updated_at"]).tzinfo is not None
     for region in ("shenandoah_valley", "northern_virginia"):
         assert set(data[region].keys()) == set(config.CATEGORIES)
 

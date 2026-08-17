@@ -2,7 +2,7 @@ import json
 import threading
 
 import app as app_module
-from app import app
+from app import app, format_updated_at
 
 
 def test_app_starts_and_serves_homepage():
@@ -19,6 +19,50 @@ def test_app_starts_and_serves_homepage():
     assert "Northern Virginia" in html
     assert "SHENANDOAH VALLEY" in html
     assert "NORTHERN VIRGINIA" in html
+
+
+def test_updated_at_is_formatted_in_eastern_daylight_time():
+    assert format_updated_at("2026-08-16T23:10:05+00:00") == (
+        "Sunday, August 16, 2026, at 7:10:05 PM"
+    )
+
+
+def test_updated_at_is_formatted_in_eastern_standard_time():
+    assert format_updated_at("2026-01-15T00:10:05+00:00") == (
+        "Wednesday, January 14, 2026, at 7:10:05 PM"
+    )
+
+
+def test_updated_at_preserves_legacy_naive_eastern_timestamps():
+    assert format_updated_at("2026-08-16T19:10:05") == (
+        "Sunday, August 16, 2026, at 7:10:05 PM"
+    )
+
+
+def test_dashboard_renders_formatted_updated_at(monkeypatch):
+    fixture_data = {
+        "updated_at": "2026-08-16T23:10:05+00:00",
+        **{
+            region_key: {
+                category_key: []
+                for category_key, _category_title in region["categories"]
+            }
+            for region_key, region in app_module.REGIONS.items()
+        },
+    }
+    monkeypatch.setattr(app_module, "load_data", lambda: fixture_data)
+
+    response = app.test_client().get("/")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Last Updated: Sunday, August 16, 2026, at 7:10:05 PM" in html
+    assert "2026-08-16T23:10:05+00:00" not in html
+
+
+def test_updated_at_falls_back_cleanly_for_missing_or_invalid_values():
+    assert format_updated_at(None) == "Not available"
+    assert format_updated_at("not-a-timestamp") == "Not available"
 
 
 def test_data_json_loads_and_has_regions_and_categories():

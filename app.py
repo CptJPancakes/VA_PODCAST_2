@@ -35,6 +35,36 @@ def format_eastern_now():
     formatted = now.strftime("%A, %B %d, %Y, %-I:%M:%S %p %Z")
     return formatted.replace("AM", "am").replace("PM", "pm")
 
+
+def format_updated_at(value):
+    """Format an ISO timestamp for the dashboard in US Eastern time.
+
+    Older data files contain timezone-naive timestamps that were intended
+    to represent Eastern local time, so preserve that interpretation. New
+    timezone-aware timestamps are converted to America/New_York, including
+    the correct daylight-saving offset for their date.
+    """
+    if not isinstance(value, str) or not value.strip():
+        return "Not available"
+
+    normalized = value.strip()
+    if normalized.endswith("Z"):
+        normalized = f"{normalized[:-1]}+00:00"
+
+    try:
+        updated = datetime.fromisoformat(normalized)
+    except ValueError:
+        return "Not available"
+
+    if updated.tzinfo is None:
+        updated = updated.replace(tzinfo=EASTERN_TZ)
+    else:
+        updated = updated.astimezone(EASTERN_TZ)
+
+    date_part = updated.strftime("%A, %B")
+    time_part = updated.strftime("%I:%M:%S %p").lstrip("0")
+    return f"{date_part} {updated.day}, {updated.year}, at {time_part}"
+
 # Real Refresh V1: this is a local, single-user app, so a plain in-process
 # lock is enough to make sure only one refresh (crawler + Topic Engine) runs
 # at a time — no queue/job-system needed. Non-blocking acquire: a second
@@ -95,7 +125,7 @@ def index():
         data=data,
         regions=REGIONS,
         current_date=current_date,
-        updated_at=data.get("updated_at", "Not available"),
+        updated_at=format_updated_at(data.get("updated_at")),
     )
 
 
