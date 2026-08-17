@@ -35,17 +35,26 @@ TOP_N_PER_CATEGORY = 3
 # local relevance
 # ---------------------------------------------------------------------------
 
-# Items from these source_ids are hyperlocal by construction (each feed is
-# already scoped to one region's outlets/localities) — they don't need a
-# place-name match to count as locally relevant, but a place-name match
-# still strengthens their score. Keyed by region since "hyperlocal" only
-# means something relative to a specific geography.
+# Items from these source_ids are hyperlocal by construction. They still
+# pass through the normal relevance filter (which protects against
+# syndicated filler), but count as a stronger locality signal once they do.
+# Keyed by region since "hyperlocal" only means something relative to a
+# specific geography.
 HYPERLOCAL_SOURCE_IDS_BY_REGION = {
     "shenandoah_valley": {
         "royal_examiner",
         "river953",
         "downtown_front_royal",
         "nvdaily_front_royal",
+        "wmra_local_news",
+        "harrisonburg_citizen",
+        "rocktown_now",
+        "page_valley_news",
+        "route_11_news",
+        "news29_shenandoah_valley",
+        "valley_today",
+        "alliance_shenandoah_valley_news",
+        "shenandoah_valley_conservancy_news",
     },
     "northern_virginia": {
         "arlnow",
@@ -96,7 +105,26 @@ LOCAL_PLACE_TERMS_BY_REGION = {
         "luray",
         "toms brook",
         "edinburg, va",
+        "shenandoah national park",
+        "harrisonburg",
+        "rockingham county",
+        "augusta county",
+        "staunton",
+        "waynesboro",
+        "rockbridge county",
+        "lexington, va",
+        "lexington, virginia",
+        "lexington virginia",
+        "buena vista, va",
+        "buena vista, virginia",
+        "buena vista virginia",
+        "frederick county, va",
+        "frederick county, virginia",
+        "middletown, va",
+        "middletown, virginia",
+        "middletown virginia",
         "winchester, va",
+        "winchester, virginia",
         "winchester virginia",
     ],
     "northern_virginia": [

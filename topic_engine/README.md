@@ -24,12 +24,13 @@ the selected Top 3 (title, heat, source count) per category.
 
 ## Pipeline
 
-1. **Load evidence** — `web_crawlers/items.json`, filtered to
-   `region == "shenandoah_valley"`.
-2. **Local relevance filter** — see below. Items that fail this are dropped
-   entirely before topic discovery; this is what keeps national/regional
-   wire content and generic syndicated columns from crowding out real
-   Front Royal / Warren County stories.
+1. **Load evidence** — `web_crawlers/items.json`. Items from source ids
+   currently marked disabled in `web_crawlers/sources.json` remain
+   archived but are excluded from topic selection.
+2. **Regional and local relevance filters** — see below. The same pipeline
+   runs per region; items that fail that region's geography check are
+   dropped before topic discovery. This keeps national material and
+   generic syndicated columns from crowding out real local stories.
 3. **Topic discovery (clustering)** — group items whose titles clearly
    describe the same underlying story into one topic.
 4. **Category assignment** — simple keyword scoring against each item's
@@ -40,8 +41,8 @@ the selected Top 3 (title, heat, source count) per category.
    for ranking.
 7. **Top 3 per category** — fewer if fewer than 3 meaningful topics exist.
    No filler is ever invented.
-8. **Write `data.json`** — `northern_virginia` is always written as empty
-   category lists; there is no Northern Virginia crawler yet.
+8. **Write `data.json`** — each configured region gets the same category
+   contract, with empty lists only when no evidence qualifies.
 
 ## Local relevance
 
@@ -58,9 +59,9 @@ An item counts as locally relevant if **any** of these is true:
   or
 - its title/text (after stripping known feed boilerplate — see below)
   mentions the target geography: Front Royal, Warren County, Shenandoah
-  Valley, or a defined list of neighboring Valley localities (Shenandoah
-  County, Clarke County, Strasburg, Woodstock, Luray, etc. — "surrounding
-  Shenandoah Valley where relevant").
+  Valley, or a defined list of Valley localities (Shenandoah, Page,
+  Rockingham, Augusta, Rockbridge, and Frederick counties; Harrisonburg,
+  Staunton, Waynesboro, Winchester, Luray, etc.).
 
 Everything else — recipes, generic career-advice columns, travel pieces,
 national wire stories that happen to run on a local outlet's feed, WHSV

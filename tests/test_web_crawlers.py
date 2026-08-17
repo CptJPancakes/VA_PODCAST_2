@@ -91,6 +91,57 @@ def test_sources_json_loads_and_has_expected_shape():
     assert all(s.get("note") for s in disabled)
 
 
+def test_requested_shenandoah_valley_sources_are_registered_once():
+    sources = load_sources()
+    source_ids = [source["id"] for source in sources]
+    requested_ids = {
+        "whsv",
+        "wmra_local_news",
+        "harrisonburg_citizen",
+        "rocktown_now",
+        "augusta_free_press",
+        "royal_examiner",
+        "river953",
+        "page_valley_news",
+        "route_11_news",
+        "news_gazette",
+        "news29_shenandoah_valley",
+        "wdbj7_local_news",
+        "valley_today",
+        "shenandoah_valley_partnership_news",
+        "shenandoah_valley_investments",
+        "virginia_business_shenandoah_valley",
+        "top_of_virginia_chamber_news",
+        "harrisonburg_rockingham_chamber_calendar",
+        "virginia_realtors_market_reports",
+        "blue_ridge_realtors_market_reports",
+        "harrisonburg_rockingham_realtors",
+        "greater_augusta_realtors_statistics",
+        "central_shenandoah_housing_study",
+        "whsv_agriculture",
+        "virginia_agriculture_press_releases",
+        "virginia_farm_bureau_newsroom",
+        "alliance_shenandoah_valley_news",
+        "shenandoah_valley_conservancy_news",
+        "shenandoah_national_park_news",
+        "visit_shenandoah_valley_events",
+        "visit_harrisonburg_events",
+        "visit_staunton_events",
+        "winchester_frederick_events",
+        "shenandoah_county_events",
+        "luray_page_events",
+        "wmra_community_calendar",
+    }
+
+    shenandoah_ids = {
+        source["id"]
+        for source in sources
+        if source["region"] == "shenandoah_valley"
+    }
+    assert requested_ids <= shenandoah_ids
+    assert len(source_ids) == len(set(source_ids))
+
+
 def test_disabled_sources_are_skipped_during_crawl(tmp_path, monkeypatch):
     sources_path = tmp_path / "sources.json"
     items_path = tmp_path / "items.json"
@@ -156,6 +207,25 @@ def test_rss_normalization(monkeypatch):
     assert item["region"] == "shenandoah_valley"
     assert item["published_at"] is not None
     assert item["collected_at"] is not None
+
+
+def test_rss_normalization_allows_whitespace_before_xml_declaration(monkeypatch):
+    source = {
+        "id": "sample_rss",
+        "name": "Sample Feed",
+        "region": "shenandoah_valley",
+        "source_type": "news",
+        "url": "https://example.com/feed/",
+        "collector_type": "rss",
+        "enabled": True,
+    }
+    content = b"\n  \n" + _sample_rss_bytes()
+    monkeypatch.setattr(crawler_module.requests, "get", lambda *a, **k: FakeResponse(content=content))
+
+    items = fetch_rss(source, window_hours=24)
+
+    assert len(items) == 1
+    assert items[0]["title"] == "Town Council approves new zoning text amendment"
 
 
 # ---------------------------------------------------------------------------

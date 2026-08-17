@@ -183,7 +183,10 @@ def build_item(source, title, url, text, published_dt, category_hint=None, autho
 def fetch_rss(source, window_hours):
     response = requests.get(source["url"], headers={"User-Agent": USER_AGENT}, timeout=REQUEST_TIMEOUT)
     response.raise_for_status()
-    root = ET.fromstring(response.content)
+    # A few otherwise-valid WordPress feeds emit blank lines before their
+    # XML declaration. ElementTree rejects declarations that are not the
+    # first bytes in the document, so tolerate leading whitespace here.
+    root = ET.fromstring(response.content.lstrip())
 
     items = []
     if root.tag.endswith("feed"):

@@ -143,6 +143,34 @@ def test_local_evidence_beats_unrelated_regional_material(tmp_path):
     assert not any("Hartford" in t for t in all_titles)
 
 
+@pytest.mark.parametrize(
+    "place_name",
+    [
+        "Harrisonburg",
+        "Rockingham County",
+        "Augusta County",
+        "Staunton",
+        "Waynesboro",
+        "Rockbridge County",
+        "Lexington, Virginia",
+        "Buena Vista, Virginia",
+        "Frederick County, Virginia",
+        "Middletown, Virginia",
+        "Shenandoah National Park",
+    ],
+)
+def test_expanded_shenandoah_valley_places_are_locally_relevant(place_name):
+    item = make_item(
+        "local",
+        "regional_source",
+        "Regional Source",
+        "news",
+        f"{place_name} community update",
+    )
+
+    assert engine.is_locally_relevant(item) is True
+
+
 def test_boilerplate_footer_does_not_create_false_local_relevance():
     item = make_item(
         "a", "river953", "The River 95.3", "news",
@@ -290,6 +318,48 @@ def test_engine_runs_fine_without_any_facebook_data(tmp_path):
     data, _, stats = engine.run_pipeline(path)
     assert stats["items_read"] == 1
     assert sum(len(v) for v in data["shenandoah_valley"].values()) == 1
+
+
+def test_pipeline_excludes_evidence_from_explicitly_disabled_sources(tmp_path):
+    items = [
+        make_item(
+            "disabled",
+            "disabled_source",
+            "Disabled Source",
+            "news",
+            "Front Royal stale archive item",
+        ),
+        make_item(
+            "active",
+            "active_source",
+            "Active Source",
+            "news",
+            "Front Royal current local item",
+        ),
+    ]
+    items_path = write_items(tmp_path, items)
+    sources_path = tmp_path / "sources.json"
+    sources_path.write_text(
+        json.dumps(
+            [
+                {"id": "disabled_source", "enabled": False},
+                {"id": "active_source", "enabled": True},
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    data, _, stats = engine.run_pipeline(items_path, sources_path)
+
+    titles = [
+        topic["title"]
+        for topics in data["shenandoah_valley"].values()
+        for topic in topics
+    ]
+    assert stats["items_read"] == 2
+    assert stats["disabled_source_items"] == 1
+    assert any("current local item" in title for title in titles)
+    assert not any("stale archive item" in title for title in titles)
 
 
 # ---------------------------------------------------------------------------

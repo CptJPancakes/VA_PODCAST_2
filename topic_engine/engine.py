@@ -35,6 +35,7 @@ except ImportError:
 BASE_DIR = Path(__file__).resolve().parent
 REPO_ROOT = BASE_DIR.parent
 ITEMS_PATH = REPO_ROOT / "web_crawlers" / "items.json"
+SOURCES_PATH = REPO_ROOT / "web_crawlers" / "sources.json"
 DATA_PATH = REPO_ROOT / "data.json"
 
 
@@ -50,6 +51,28 @@ def load_items(path=None):
     with open(path, "r", encoding="utf-8") as handle:
         items = json.load(handle)
     return items if isinstance(items, list) else []
+
+
+def load_disabled_source_ids(path=None):
+    """Return source ids explicitly disabled in the crawler registry.
+
+    Raw evidence is intentionally retained in items.json, so the Topic
+    Engine must enforce current source status when selecting dashboard
+    topics. Unknown source ids remain eligible, which keeps fixtures and
+    other evidence producers independent of this registry.
+    """
+    path = Path(path) if path is not None else SOURCES_PATH
+    if not path.exists():
+        return set()
+    with open(path, "r", encoding="utf-8") as handle:
+        sources = json.load(handle)
+    if not isinstance(sources, list):
+        return set()
+    return {
+        source.get("id")
+        for source in sources
+        if source.get("id") and source.get("enabled") is False
+    }
 
 
 def parse_iso(value):
@@ -540,13 +563,25 @@ def run_pipeline_for_region(items, region):
     return region_data, region_debug, region_stats
 
 
-def run_pipeline(items_path=None):
-    items = load_items(items_path)
+def run_pipeline(items_path=None, sources_path=None):
+    all_items = load_items(items_path)
+    disabled_source_ids = load_disabled_source_ids(sources_path)
+    items = [
+        item
+        for item in all_items
+        if item.get("source_id") not in disabled_source_ids
+    ]
 
     data = {"updated_at": datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}
     selected_debug = []
-    stats = {"items_read": len(items), "regional_items": 0, "locally_relevant_items": 0,
-              "topics_discovered": 0, "by_region": {}}
+    stats = {
+        "items_read": len(all_items),
+        "disabled_source_items": len(all_items) - len(items),
+        "regional_items": 0,
+        "locally_relevant_items": 0,
+        "topics_discovered": 0,
+        "by_region": {},
+    }
 
     for region in config.REGIONS:
         region_data, region_debug, region_stats = run_pipeline_for_region(items, region)
@@ -579,6 +614,7 @@ def write_data(data, path=None):
 
 def print_summary(data, selected_debug, stats):
     print(f"items read from web_crawlers/items.json: {stats['items_read']}")
+    print(f"items excluded from disabled sources: {stats['disabled_source_items']}")
     print()
     for region in config.REGIONS:
         region_stats = stats["by_region"][region]

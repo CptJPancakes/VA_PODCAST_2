@@ -189,6 +189,340 @@
     "enabled": true,
     "note": "Official CivicPlus Alert Center RSS feed, verified live (may be empty between releases)."
   },
+  {
+    "id": "wmra_local_news",
+    "name": "WMRA Local News",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://www.wmra.org/wmra-news-features-briefs.rss",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Section RSS feed discovered from the supplied WMRA page and parser-smoke-tested live."
+  },
+  {
+    "id": "harrisonburg_citizen",
+    "name": "The Harrisonburg Citizen",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://hburgcitizen.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "WordPress RSS feed, verified live."
+  },
+  {
+    "id": "rocktown_now",
+    "name": "Rocktown Now",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://rocktownnow.com/news/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "News-section RSS feed discovered from the supplied page and parser-smoke-tested live."
+  },
+  {
+    "id": "augusta_free_press",
+    "name": "Augusta Free Press",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://augustafreepress.com/local-afp/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Local-news section RSS feed discovered from the supplied site and parser-smoke-tested live."
+  },
+  {
+    "id": "page_valley_news",
+    "name": "Page Valley News",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://pagevalleynews.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "WordPress RSS feed, parser-smoke-tested live."
+  },
+  {
+    "id": "route_11_news",
+    "name": "Route 11 News",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://route11news.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "WordPress RSS feed, verified live."
+  },
+  {
+    "id": "news_gazette",
+    "name": "The News-Gazette",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://www.thenews-gazette.com/articles",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the supplied archive is live, but its titles are outside the generic HTML collector's supported structures; the site's /articles/feed/ response is malformed XML."
+  },
+  {
+    "id": "news29_shenandoah_valley",
+    "name": "29News: Shenandoah Valley",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://www.29news.com/arc/outboundfeeds/rss/category/news/shenandoah-valley/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Gray/Arc Shenandoah Valley category RSS feed, parser-smoke-tested live."
+  },
+  {
+    "id": "wdbj7_local_news",
+    "name": "WDBJ7 Local News",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://www.wdbj7.com/arc/outboundfeeds/rss/category/news/local/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Gray/Arc local-news category RSS feed, parser-smoke-tested live."
+  },
+  {
+    "id": "valley_today",
+    "name": "The Valley Today",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://feeds.libsyn.com/344060/rss",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official Libsyn podcast RSS feed corresponding to the supplied show site, parser-smoke-tested live."
+  },
+
+  {
+    "id": "shenandoah_valley_partnership_news",
+    "name": "Shenandoah Valley Partnership News",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://theshenandoahvalley.com/news/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: no dated feed was found, and the generic HTML collector would refresh older archive entries as if they were newly published."
+  },
+  {
+    "id": "shenandoah_valley_investments",
+    "name": "Shenandoah Valley Investments",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://theshenandoahvalley.com/recent-investments/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the live investment data is rendered as table rows rather than supported article links, so the generic HTML collector returns no items."
+  },
+  {
+    "id": "virginia_business_shenandoah_valley",
+    "name": "Virginia Business: Shenandoah Valley",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://virginiabusiness.com/category/news/regions/shenandoah-vallery/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the site's canonical category slug is 'shenandoah-vallery', but both the category page and its RSS feed return HTTP 403 to the crawler."
+  },
+  {
+    "id": "top_of_virginia_chamber_news",
+    "name": "Top of Virginia Regional Chamber News",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://business.regionalchamber.biz/news",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the generic HTML results have no publication timestamps and mix chamber releases with member-directory profiles, making them unsafe for topic freshness."
+  },
+  {
+    "id": "harrisonburg_rockingham_chamber_calendar",
+    "name": "Harrisonburg–Rockingham Chamber Calendar",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://chamber.hrchamber.org/events/calendar",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: no dated feed was found, and the generic HTML collector includes past calendar entries without preserving their event dates."
+  },
+
+  {
+    "id": "virginia_realtors_market_reports",
+    "name": "Virginia REALTORS Market Reports",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://virginiarealtors.org/research/reports/home-sales-reports/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the advertised RSS endpoint is not live, and generic HTML collection cannot preserve report dates, causing older reports to appear newly published."
+  },
+  {
+    "id": "blue_ridge_realtors_market_reports",
+    "name": "Blue Ridge REALTORS Market Reports",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://www.blueridgerealtors.com/market-indicators-report/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the page mixes several years of monthly PDFs, while generic HTML collection cannot preserve their report dates or add real-estate context."
+  },
+  {
+    "id": "harrisonburg_rockingham_realtors",
+    "name": "Harrisonburg–Rockingham REALTORS",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://www.hrar.com/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the supplied homepage exposes evergreen organization links, not a dedicated market-report or news stream."
+  },
+  {
+    "id": "greater_augusta_realtors_statistics",
+    "name": "Greater Augusta REALTORS Statistics",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://greateraugustarealtors.com/pdfs.php",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the legacy statistics/PDF endpoint timed out during live collection and no feed or reliable structured listing was found."
+  },
+  {
+    "id": "central_shenandoah_housing_study",
+    "name": "Central Shenandoah Housing Study",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://connect.cspdc.org/cspdc-housing-study",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: this is an evergreen study landing page rather than a dated update stream; collecting it would make unchanged reports appear newly published."
+  },
+
+  {
+    "id": "whsv_agriculture",
+    "name": "WHSV Agriculture",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://www.whsv.com/arc/outboundfeeds/rss/category/news/agriculture/",
+    "collector_type": "rss",
+    "enabled": false,
+    "note": "DISABLED: the category feed is live, but it can overlap the existing WHSV local feed; source-id-based diversity would incorrectly count one newsroom as two independent outlets."
+  },
+  {
+    "id": "virginia_agriculture_press_releases",
+    "name": "Virginia Department of Agriculture",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.vdacs.virginia.gov/media-press-releases-26.shtml",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the statewide annual archive does not expose release titles through the generic collector's supported structures, and no RSS/JSON feed was found."
+  },
+  {
+    "id": "virginia_farm_bureau_newsroom",
+    "name": "Virginia Farm Bureau Newsroom",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://articles.vafb.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Newsroom WordPress RSS feed reached from the supplied Farm Bureau page and parser-smoke-tested live."
+  },
+  {
+    "id": "alliance_shenandoah_valley_news",
+    "name": "Alliance for the Shenandoah Valley",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://shenandoahalliance.org/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Valley-focused WordPress RSS feed, verified live; it includes harmless leading whitespace before the XML declaration."
+  },
+  {
+    "id": "shenandoah_valley_conservancy_news",
+    "name": "Shenandoah Valley Conservancy",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://shenandoah.org/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "WordPress newsroom RSS feed, parser-smoke-tested live."
+  },
+  {
+    "id": "shenandoah_national_park_news",
+    "name": "Shenandoah National Park News",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.nps.gov/feeds/getnewsrss.htm?id=shen",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official park-specific National Park Service RSS feed, parser-smoke-tested live."
+  },
+
+  {
+    "id": "visit_shenandoah_valley_events",
+    "name": "Visit Shenandoah Valley Events",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://visitshenandoah.org/events-listings/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the static page exposes the calendar shell and regional navigation, while actual event records require its JavaScript/AJAX calendar."
+  },
+  {
+    "id": "visit_harrisonburg_events",
+    "name": "Visit Harrisonburg Events",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://visitharrisonburgva.com/calendar-of-events/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the static response contains calendar controls but no event records, so the generic HTML collector returns no items."
+  },
+  {
+    "id": "visit_staunton_events",
+    "name": "Visit Staunton Events",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://visitstaunton.com/events/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: event cards are visible to the generic HTML collector, but their dates are not preserved, so past events could be refreshed as current."
+  },
+  {
+    "id": "winchester_frederick_events",
+    "name": "Winchester–Frederick Events",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://visitwinchesterva.com/events/feed/",
+    "collector_type": "rss",
+    "enabled": false,
+    "note": "DISABLED: the live RSS uses future event dates as pubDate values and omits locality text, so the current topic engine would misclassify event timing and reject the items as non-local."
+  },
+  {
+    "id": "shenandoah_county_events",
+    "name": "Shenandoah County Events",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://visitshenandoahcounty.com/events/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the static response exposes event-category landing pages, but the actual calendar listings are JavaScript/API-driven."
+  },
+  {
+    "id": "luray_page_events",
+    "name": "Luray–Page Events",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://www.visitluraypage.com/events/calendar",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: the current generic collector sees month-navigation links rather than individual calendar events; no compatible feed was found."
+  },
+  {
+    "id": "wmra_community_calendar",
+    "name": "WMRA Community Calendar",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://www.wmra.org/community-calendar",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: no dated feed was found, and generic HTML collection cannot preserve event dates, so old entries could appear newly published."
+  },
 
   {
     "id": "arlnow",
