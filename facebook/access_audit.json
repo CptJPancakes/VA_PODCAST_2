@@ -1,0 +1,74 @@
+[
+  {
+    "source_id": "whats_up_front_royal_va",
+    "name": "What's Up Front Royal Va",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "whats_up_front_royal_warren_county",
+    "name": "WHAT'S UP FRONT ROYAL WARREN COUNTY",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "front_royal_community_events",
+    "name": "Front Royal Community Events",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "front_royal_whats_up",
+    "name": "Front Royal What's Up",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "front_royal_va_business_community",
+    "name": "Front Royal, Va Business Community",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "see_the_good_in_front_royal_va",
+    "name": "See the Good in Front Royal, VA",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "whats_up_warren_county_and_front_royal",
+    "name": "Whats Up Warren County and Front Royal",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "protect_warren_county_no_data_centers",
+    "name": "Protect Warren County – No Data Centers",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "warren_county_sheriffs_office",
+    "name": "Warren County Sheriff's Office",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "warren_county_fire_and_rescue",
+    "name": "Warren County Fire & Rescue",
+    "status": "BLOCKED",
+    "reason": "No URL provided"
+  },
+  {
+    "source_id": "front_royal_police",
+    "name": "Front Royal Police Department",
+    "status": "PUBLIC_ACCESSIBLE",
+    "reason": "URL is present and ready for public collection checks."
+  },
+  {
+    "source_id": "front_royal_fire_ems_calls_and_police_incidents",
+    "name": "Front Royal & Warren Co Fire-Ems calls AND Police incidents.",
+    "status": "PUBLIC_ACCESSIBLE",
+    "reason": "URL is present and ready for public collection checks."
+  }
+]

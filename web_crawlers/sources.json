@@ -1,0 +1,383 @@
+[
+  {
+    "id": "royal_examiner",
+    "name": "Royal Examiner",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://royalexaminer.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "WordPress RSS feed, verified live."
+  },
+  {
+    "id": "river953",
+    "name": "The River 95.3 (WZRV)",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://theriver953.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "WordPress RSS feed, verified live."
+  },
+  {
+    "id": "whsv",
+    "name": "WHSV",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://www.whsv.com/arc/outboundfeeds/rss/category/news/local/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Regional Shenandoah Valley TV news feed (Arc Publishing), scoped to the /news/local/ category so it carries Valley-area stories instead of the national wire mix on the unscoped feed. Not Front Royal-specific, kept as a supporting regional source."
+  },
+  {
+    "id": "nvdaily_front_royal",
+    "name": "Northern Virginia Daily - Front Royal section",
+    "region": "shenandoah_valley",
+    "source_type": "news",
+    "url": "https://www.nvdaily.com/search/?f=rss&t=article&c=news/front-royal&l=50&s=start_time&sd=desc",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "TownNews/BLOX section RSS scoped to the Front Royal category (discovered via the site's own rss+xml autodiscovery link), verified live."
+  },
+  {
+    "id": "downtown_front_royal",
+    "name": "Downtown Front Royal",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://downtownfrontroyal.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "WordPress RSS feed, verified live."
+  },
+  {
+    "id": "front_royal_chamber",
+    "name": "Front Royal/Warren County Chamber of Commerce",
+    "region": "shenandoah_valley",
+    "source_type": "business",
+    "url": "https://www.frontroyalchamber.com/",
+    "collector_type": "rss",
+    "enabled": false,
+    "note": "DISABLED: blog-feed.xml exists (https://www.frontroyalchamber.com/blog-feed.xml) but contains only a single placeholder post from 2021 ('A Work In Progress'). The events calendar is a Wix-rendered JS app with no static HTML or feed path. Revisit if the chamber blog becomes active or a Wix API path is found."
+  },
+  {
+    "id": "discover_front_royal",
+    "name": "Discover Front Royal",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://www.discoverfrontroyal.com/front-royal-events-calendar.html",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: Weebly-based site with no RSS/JSON. The events calendar renders through a JS widget with no clean static HTML listing to parse. Would require browser automation."
+  },
+  {
+    "id": "wcps",
+    "name": "Warren County Public Schools",
+    "region": "shenandoah_valley",
+    "source_type": "schools",
+    "url": "https://www.wcpsva.org/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: no RSS feed discovered. Site runs on a ConnectSuite CMS with news/calendar content rendered via JS (FullCalendar) widgets; no simple static or JSON path identified in this pass."
+  },
+  {
+    "id": "vdot_staunton",
+    "name": "VDOT Staunton District",
+    "region": "shenandoah_valley",
+    "source_type": "roads",
+    "url": "https://www.vdot.virginia.gov/news-events/news/staunton-district/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: no RSS feed. The Staunton District news page covers all 11 counties in the district with no Front Royal/Warren County-specific filter, so scraping it would require aggressive keyword filtering across too broad a scope. Revisit if VDOT adds a localized feed."
+  },
+  {
+    "id": "front_royal_town_news",
+    "name": "Town of Front Royal - News Flash",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.frontroyalva.com/RSSFeed.aspx?ModID=1&CID=All-newsflash.xml",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus RSS feed (includes public notices), verified live."
+  },
+  {
+    "id": "front_royal_town_alerts",
+    "name": "Town of Front Royal - Town Alerts",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.frontroyalva.com/RSSFeed.aspx?ModID=63&CID=Town-Alerts-4",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus alert center RSS feed, verified live."
+  },
+  {
+    "id": "front_royal_planning_commission",
+    "name": "Town of Front Royal - Planning Commission",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.frontroyalva.com/RSSFeed.aspx?ModID=65&CID=Planning-Commission-3",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus Agenda Creator RSS feed, verified live."
+  },
+  {
+    "id": "front_royal_town_council",
+    "name": "Town of Front Royal - Town Council Meeting Agendas",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.frontroyalva.com/RSSFeed.aspx?ModID=65&CID=Town-Council-Meeting-Agendas-2",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus Agenda Creator RSS feed, verified live (may be empty between meetings)."
+  },
+  {
+    "id": "front_royal_community_events",
+    "name": "Town of Front Royal - Community Events Calendar",
+    "region": "shenandoah_valley",
+    "source_type": "events",
+    "url": "https://www.frontroyalva.com/RSSFeed.aspx?ModID=58&CID=Community-Events-33",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus calendar RSS feed, verified live."
+  },
+  {
+    "id": "front_royal_real_estate_commercial",
+    "name": "Town of Front Royal - Real Estate Locator (Commercial For Sale)",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.frontroyalva.com/RSSFeed.aspx?ModID=64&CID=Commercial-Properties-For-Sale-1",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus Real Estate Locator RSS feed, verified live (may be empty when no listings are posted)."
+  },
+  {
+    "id": "front_royal_real_estate_residential",
+    "name": "Town of Front Royal - Real Estate Locator (Residential For Sale)",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.frontroyalva.com/RSSFeed.aspx?ModID=64&CID=Residential-Properties-For-Sale-3",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus Real Estate Locator RSS feed, verified live (may be empty when no listings are posted)."
+  },
+  {
+    "id": "warren_county_news",
+    "name": "Warren County - News Flash",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.warrencountyva.gov/RSSFeed.aspx?ModID=1&CID=All-newsflash.xml",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus RSS feed, verified live."
+  },
+  {
+    "id": "warren_county_calendar",
+    "name": "Warren County - Calendar (incl. Board of Supervisors, Planning, Public Works)",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.warrencountyva.gov/RSSFeed.aspx?ModID=58&CID=All-calendar.xml",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus calendar RSS feed covering all county calendar categories (Board of Supervisors, Planning, Fire & Rescue, Parks & Recreation, Public Works), verified live."
+  },
+  {
+    "id": "warren_county_press_release",
+    "name": "Warren County - Press Releases",
+    "region": "shenandoah_valley",
+    "source_type": "government",
+    "url": "https://www.warrencountyva.gov/RSSFeed.aspx?ModID=63&CID=Press-Release-21",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus Alert Center RSS feed, verified live (may be empty between releases)."
+  },
+
+  {
+    "id": "arlnow",
+    "name": "ARLnow",
+    "region": "northern_virginia",
+    "source_type": "news",
+    "url": "https://www.arlnow.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Hyperlocal Arlington WordPress RSS feed, verified live."
+  },
+  {
+    "id": "alxnow",
+    "name": "ALXnow",
+    "region": "northern_virginia",
+    "source_type": "news",
+    "url": "https://www.alxnow.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Hyperlocal Alexandria WordPress RSS feed, verified live."
+  },
+  {
+    "id": "ffxnow",
+    "name": "FFXnow",
+    "region": "northern_virginia",
+    "source_type": "news",
+    "url": "https://www.ffxnow.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Hyperlocal Fairfax County WordPress RSS feed, verified live."
+  },
+  {
+    "id": "loudoun_now",
+    "name": "Loudoun Now",
+    "region": "northern_virginia",
+    "source_type": "news",
+    "url": "https://www.loudounnow.com/search/?f=rss&t=article&c=news/loudoun&l=30&s=start_time&sd=desc",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "TownNews/BLOX section RSS scoped to the Loudoun news category. The unscoped #topstory feed mixed in unrelated wire/PR content (e.g. an Avis Budget Group securities-fraud notice), so the c=news/loudoun scope is used instead, same pattern as nvdaily_front_royal."
+  },
+  {
+    "id": "falls_church_news_press",
+    "name": "Falls Church News-Press",
+    "region": "northern_virginia",
+    "source_type": "news",
+    "url": "https://www.fcnp.com/feed/",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Hyperlocal Falls Church WordPress RSS feed, verified live."
+  },
+  {
+    "id": "insidenova_arlington",
+    "name": "InsideNoVa - Arlington section",
+    "region": "northern_virginia",
+    "source_type": "news",
+    "url": "https://www.insidenova.com/search/?f=rss&t=article&c=news/arlington&l=30&s=start_time&sd=desc",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "TownNews/BLOX section RSS scoped to the Arlington category, verified live."
+  },
+  {
+    "id": "insidenova_fairfax",
+    "name": "InsideNoVa - Fairfax section",
+    "region": "northern_virginia",
+    "source_type": "news",
+    "url": "https://www.insidenova.com/search/?f=rss&t=article&c=news/fairfax&l=30&s=start_time&sd=desc",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "TownNews/BLOX section RSS scoped to the Fairfax category, verified live."
+  },
+  {
+    "id": "insidenova_loudoun",
+    "name": "InsideNoVa - Loudoun section",
+    "region": "northern_virginia",
+    "source_type": "news",
+    "url": "https://www.insidenova.com/search/?f=rss&t=article&c=news/loudoun&l=30&s=start_time&sd=desc",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "TownNews/BLOX section RSS scoped to the Loudoun category, verified live."
+  },
+  {
+    "id": "insidenova_prince_william",
+    "name": "InsideNoVa - Prince William section",
+    "region": "northern_virginia",
+    "source_type": "news",
+    "url": "https://www.insidenova.com/search/?f=rss&t=article&c=news/prince_william&l=30&s=start_time&sd=desc",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "TownNews/BLOX section RSS scoped to the Prince William category (covers Manassas/Gainesville/Haymarket/Woodbridge), verified live."
+  },
+  {
+    "id": "alexandria_dockets",
+    "name": "City of Alexandria - City Dockets (Agenda Feed)",
+    "region": "northern_virginia",
+    "source_type": "government",
+    "url": "https://alexandria.granicus.com/ViewPublisherRSS.php?view_id=57&mode=agendas",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official Granicus agenda RSS covering City Council, Planning Commission, Board of Architectural Review, and Board of Zoning Appeals, verified live. alexandriava.gov itself (Drupal) has no discoverable news RSS; its /rss.xml is a generic staff-directory feed, not news, so it was not used."
+  },
+  {
+    "id": "loudoun_county_news",
+    "name": "Loudoun County - County News",
+    "region": "northern_virginia",
+    "source_type": "government",
+    "url": "https://www.loudoun.gov/RSSFeed.aspx?ModID=1&CID=County-News-10",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus RSS feed, verified live (same CivicPlus platform as Front Royal/Warren County)."
+  },
+  {
+    "id": "loudoun_county_meetings",
+    "name": "Loudoun County - Calendar (County Meetings)",
+    "region": "northern_virginia",
+    "source_type": "government",
+    "url": "https://www.loudoun.gov/RSSFeed.aspx?ModID=58&CID=County-Meetings-14",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus calendar RSS feed, verified live."
+  },
+  {
+    "id": "loudoun_county_planning_zoning",
+    "name": "Loudoun County - Alert Center (Planning and Zoning)",
+    "region": "northern_virginia",
+    "source_type": "government",
+    "url": "https://www.loudoun.gov/RSSFeed.aspx?ModID=63&CID=Planning-and-Zoning-18",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus Alert Center RSS feed, verified live (may be empty between alerts)."
+  },
+  {
+    "id": "loudoun_county_events",
+    "name": "Loudoun County - Calendar (County Events)",
+    "region": "northern_virginia",
+    "source_type": "events",
+    "url": "https://www.loudoun.gov/RSSFeed.aspx?ModID=58&CID=County-Events-34",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official CivicPlus calendar RSS feed, verified live."
+  },
+  {
+    "id": "prince_william_board_supervisors",
+    "name": "Prince William County - Board of County Supervisors Meetings",
+    "region": "northern_virginia",
+    "source_type": "government",
+    "url": "https://pwcgov.granicus.com/ViewPublisherRSS.php?view_id=23&mode=agendas",
+    "collector_type": "rss",
+    "enabled": true,
+    "note": "Official Granicus agenda RSS for the Board of County Supervisors, verified live with genuinely current meeting dates."
+  },
+  {
+    "id": "arlington_county_gov",
+    "name": "Arlington County Government",
+    "region": "northern_virginia",
+    "source_type": "government",
+    "url": "https://www.arlingtonva.us/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: arlingtonva.us is behind an Akamai WAF that returns 403 Access Denied to all automated requests (not a UA issue - verified with multiple realistic browser User-Agents and full header sets). ARLnow and InsideNoVa's Arlington section are used instead for Arlington coverage."
+  },
+  {
+    "id": "arlington_county_granicus",
+    "name": "Arlington County - County Board Meetings (Granicus)",
+    "region": "northern_virginia",
+    "source_type": "government",
+    "url": "https://arlington.granicus.com/ViewPublisherRSS.php?view_id=2&mode=agendas",
+    "collector_type": "rss",
+    "enabled": false,
+    "note": "DISABLED: the feed itself is reachable, but its most recent entries are dated 2024 (verified by inspecting pubDate values), meaning it is not being actively updated. Not a clean live source."
+  },
+  {
+    "id": "fairfax_county_gov",
+    "name": "Fairfax County Government",
+    "region": "northern_virginia",
+    "source_type": "government",
+    "url": "https://www.fairfaxcounty.gov/news/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: no RSS feed discovered on the current NewsCenter. The legacy /rssfeeds/ subsystem returns 'This site has been retired. Offline.' FFXnow and InsideNoVa's Fairfax section are used instead for Fairfax coverage."
+  },
+  {
+    "id": "prince_william_county_gov",
+    "name": "Prince William County Government",
+    "region": "northern_virginia",
+    "source_type": "government",
+    "url": "https://www.pwcva.gov/",
+    "collector_type": "html",
+    "enabled": false,
+    "note": "DISABLED: Gatsby-built site with no discoverable RSS/JSON; common feed paths return 403 or are unrelated content-page slugs. InsideNoVa's Prince William section and the county's own Granicus Board of Supervisors feed are used instead."
+  }
+]

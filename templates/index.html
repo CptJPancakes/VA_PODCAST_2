@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VA_PODCAST</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="masthead">
+        <div class="masthead__top-row">
+          <div class="headline-block">
+            <p class="eyebrow">LOCAL MEDIA INTELLIGENCE</p>
+            <h1>WHAT'S WORTH TALKING ABOUT TODAY?</h1>
+          </div>
+          <button id="refresh-button" class="refresh-button" type="button">Refresh</button>
+        </div>
+
+        <div class="header-bar">
+          <div class="header-meta">
+            <span class="meta-item">{{ current_date }}</span>
+            <span class="meta-item">Last updated: {{ updated_at }}</span>
+          </div>
+
+          <div class="header-controls">
+            <div class="timeframe-selector" aria-label="Timeframe selector">
+              <button class="timeframe active" type="button" data-range="today">Today</button>
+              <button class="timeframe" type="button" data-range="24h">24 Hours</button>
+              <button class="timeframe" type="button" data-range="3d">3 Days</button>
+              <button class="timeframe" type="button" data-range="7d">7 Days</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <nav class="tab-nav" aria-label="Primary navigation">
+        <button class="tab active" type="button" data-target="timeline" aria-selected="true">Timeline</button>
+        <button class="tab" type="button" data-target="shenandoah_valley" aria-selected="false">Shenandoah Valley</button>
+        <button class="tab" type="button" data-target="northern_virginia" aria-selected="false">Northern Virginia</button>
+      </nav>
+
+      <main class="dashboard">
+        <section class="tab-panel active" data-panel="timeline">
+          <div class="timeline-shell">
+            <div class="section-label">Timeline</div>
+            <div class="timeline-feed">
+              {% for region_key, region_meta in regions.items() %}
+                {% for category_key, category_title in region_meta['categories'] %}
+                  {% set topics = data[region_key][category_key] %}
+                  {% for topic in topics %}
+                    <article class="timeline-item">
+                      <div class="timeline-marker"></div>
+                      <div class="timeline-card">
+                        <div class="timeline-meta-line">
+                          <span class="timeline-region">{{ region_meta['title'] }}</span>
+                          <span class="dot">•</span>
+                          <span>{{ category_title }}</span>
+                          {% if topic.heat is defined %}
+                            <span class="dot">•</span>
+                            <span class="heat heat--{{ topic.heat|lower|replace(' ', '-') }}">{{ topic.heat }}</span>
+                          {% endif %}
+                        </div>
+                        <h3>{{ topic.title }}</h3>
+                        <p class="summary">{{ topic.summary }}</p>
+
+                        {% if topic.why_trending is defined %}
+                        <div class="why-trending-block">
+                          <span class="mini-label">Why It's Trending</span>
+                          <p>{{ topic.why_trending }}</p>
+                        </div>
+                        {% endif %}
+
+                        <div class="stats-row">
+                          <span>{{ topic.mentions }} mentions</span>
+                          <span>•</span>
+                          <span>{{ topic.source_count }} sources</span>
+                          <span>•</span>
+                          <span>Updated {{ topic.latest_activity }}</span>
+                        </div>
+
+                        <div class="source-line">
+                          <span class="mini-label">Covered by</span>
+                          <div>
+                            {% for source in topic.source_names %}
+                              {{ source }}{% if not loop.last %} • {% endif %}
+                            {% endfor %}
+                          </div>
+                        </div>
+
+                        <button class="details-button" type="button">View Topic</button>
+                        <div class="topic-details" hidden>
+                          {% if topic.related_keywords %}
+                          <div class="details-block">
+                            <strong>Keywords</strong>
+                            <div>
+                              {% for keyword in topic.related_keywords %}
+                                <span class="keyword-pill">{{ keyword }}</span>
+                              {% endfor %}
+                            </div>
+                          </div>
+                          {% endif %}
+                          <div class="details-grid">
+                            <div><strong>Mentions</strong><br />{{ topic.mentions }}</div>
+                            <div><strong>Sources</strong><br />{{ topic.source_count }}</div>
+                            <div><strong>First detected</strong><br />{{ topic.first_detected }}</div>
+                            <div><strong>Latest</strong><br />{{ topic.latest_activity }}</div>
+                          </div>
+                          {% if topic.details %}
+                          <div class="details-copy">{{ topic.details }}</div>
+                          {% endif %}
+                          {% if topic.article_links %}
+                          <ul class="link-list">
+                            {% for link in topic.article_links %}
+                              <li><a href="{{ link }}" target="_blank" rel="noreferrer">Source link</a></li>
+                            {% endfor %}
+                          </ul>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </article>
+                  {% endfor %}
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+
+        {% for region_key, region_meta in regions.items() %}
+          <section class="tab-panel" data-panel="{{ region_key }}">
+            <div class="region-block" data-region="{{ region_key }}">
+              <div class="region-heading-wrap">
+                <div class="region-heading">{{ region_meta['title'] }}</div>
+                <div class="region-subtitle">
+                  {% if region_key == 'shenandoah_valley' %}
+                    Front Royal • Warren County • Surrounding Valley
+                  {% else %}
+                    Arlington • Fairfax • Loudoun • Prince William • Alexandria
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="category-grid">
+                {% for category_key, category_title in region_meta['categories'] %}
+                  <article class="category-card" data-category="{{ category_key }}">
+                    <h2>{{ category_title }}</h2>
+
+                    {% set topics = data[region_key][category_key] %}
+                    {% if topics %}
+                      <div class="topic-list">
+                        {% for topic in topics[:3] %}
+                          <article class="topic-card" data-topic-id="{{ region_key }}-{{ category_key }}-{{ loop.index0 }}">
+                            <div class="topic-topline">
+                              <span class="rank">#{{ topic.rank }}</span>
+                              {% if topic.heat is defined %}
+                                <span class="heat heat--{{ topic.heat|lower|replace(' ', '-') }}">{{ topic.heat }}</span>
+                              {% endif %}
+                              {% if topic.trend == 'up' %}
+                                <span class="trend trend--up">Rising</span>
+                              {% elif topic.trend == 'steady' %}
+                                <span class="trend trend--steady">Active</span>
+                              {% else %}
+                                <span class="trend trend--down">Cooling</span>
+                              {% endif %}
+                            </div>
+
+                            <h3>{{ topic.title }}</h3>
+                            <p class="summary">{{ topic.summary }}</p>
+
+                            {% if topic.why_trending is defined %}
+                            <div class="why-trending-block compact">
+                              <span class="mini-label">Why It's Trending</span>
+                              <p>{{ topic.why_trending }}</p>
+                            </div>
+                            {% endif %}
+
+                            <div class="stats-row">
+                              <span>{{ topic.mentions }} mentions</span>
+                              <span>•</span>
+                              <span>{{ topic.source_count }} sources</span>
+                              <span>•</span>
+                              <span>Updated {{ topic.latest_activity }}</span>
+                            </div>
+
+                            <div class="source-line">
+                              <span class="mini-label">Covered by</span>
+                              <div>
+                                {% for source in topic.source_names %}
+                                  {{ source }}{% if not loop.last %} • {% endif %}
+                                {% endfor %}
+                              </div>
+                            </div>
+
+                            <button class="details-button" type="button">View Topic</button>
+
+                            <div class="topic-details" hidden>
+                              {% if topic.related_keywords %}
+                              <div class="details-block">
+                                <strong>Keywords</strong>
+                                <div>
+                                  {% for keyword in topic.related_keywords %}
+                                    <span class="keyword-pill">{{ keyword }}</span>
+                                  {% endfor %}
+                                </div>
+                              </div>
+                              {% endif %}
+                              <div class="details-grid">
+                                <div><strong>Mentions</strong><br />{{ topic.mentions }}</div>
+                                <div><strong>Sources</strong><br />{{ topic.source_count }}</div>
+                                <div><strong>First detected</strong><br />{{ topic.first_detected }}</div>
+                                <div><strong>Latest</strong><br />{{ topic.latest_activity }}</div>
+                              </div>
+                              {% if topic.details %}
+                              <div class="details-copy">{{ topic.details }}</div>
+                              {% endif %}
+                              {% if topic.article_links %}
+                              <ul class="link-list">
+                                {% for link in topic.article_links %}
+                                  <li><a href="{{ link }}" target="_blank" rel="noreferrer">Source link</a></li>
+                                {% endfor %}
+                              </ul>
+                              {% endif %}
+                            </div>
+                          </article>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <div class="empty-state">No meaningful topics detected for this category yet.</div>
+                    {% endif %}
+                  </article>
+                {% endfor %}
+              </div>
+            </div>
+          </section>
+        {% endfor %}
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

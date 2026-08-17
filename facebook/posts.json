@@ -1,0 +1,46 @@
+[
+  {
+    "post_id": "demo_front_royal_police_post_1",
+    "source_id": "front_royal_police",
+    "source_name": "Front Royal Police Department",
+    "source_type": "facebook_page",
+    "region": "shenandoah_valley",
+    "post_url": "https://www.facebook.com/frontroyalpolice",
+    "post_text": "Demo public post for Facebook collection validation.",
+    "published_at": "2026-08-16T00:00:27.945018+00:00",
+    "collected_at": "2026-08-16T00:00:27.946099+00:00",
+    "comments_count": 2,
+    "reactions_count": 18,
+    "shares_count": 3,
+    "comments": [
+      {
+        "comment_id": "demo_comment_1",
+        "text": "This is a sample comment used to validate normalization.",
+        "published_at": "2026-08-16T00:00:27.946040+00:00",
+        "reactions_count": 5
+      }
+    ]
+  },
+  {
+    "post_id": "demo_front_royal_fire_ems_calls_and_police_incidents_post_1",
+    "source_id": "front_royal_fire_ems_calls_and_police_incidents",
+    "source_name": "Front Royal & Warren Co Fire-Ems calls AND Police incidents.",
+    "source_type": "facebook_group",
+    "region": "shenandoah_valley",
+    "post_url": "https://www.facebook.com/groups/debfox/",
+    "post_text": "Demo public post for Facebook collection validation.",
+    "published_at": "2026-08-16T00:00:27.950527+00:00",
+    "collected_at": "2026-08-16T00:00:27.950615+00:00",
+    "comments_count": 2,
+    "reactions_count": 18,
+    "shares_count": 3,
+    "comments": [
+      {
+        "comment_id": "demo_comment_1",
+        "text": "This is a sample comment used to validate normalization.",
+        "published_at": "2026-08-16T00:00:27.950574+00:00",
+        "reactions_count": 5
+      }
+    ]
+  }
+]

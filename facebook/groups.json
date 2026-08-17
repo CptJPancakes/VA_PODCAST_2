@@ -1,0 +1,134 @@
+[
+  {
+    "id": "whats_up_front_royal_va",
+    "name": "What's Up Front Royal Va",
+    "type": "group",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "high",
+    "community_weight": 1.5,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "whats_up_front_royal_warren_county",
+    "name": "WHAT'S UP FRONT ROYAL WARREN COUNTY",
+    "type": "group",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "high",
+    "community_weight": 1.5,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "front_royal_community_events",
+    "name": "Front Royal Community Events",
+    "type": "group",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "high",
+    "community_weight": 1.4,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "front_royal_whats_up",
+    "name": "Front Royal What's Up",
+    "type": "group",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "medium",
+    "community_weight": 1.3,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "front_royal_va_business_community",
+    "name": "Front Royal, Va Business Community",
+    "type": "group",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "medium",
+    "community_weight": 1.3,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "see_the_good_in_front_royal_va",
+    "name": "See the Good in Front Royal, VA",
+    "type": "page",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "medium",
+    "community_weight": 1.2,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "whats_up_warren_county_and_front_royal",
+    "name": "Whats Up Warren County and Front Royal",
+    "type": "group",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "high",
+    "community_weight": 1.5,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "protect_warren_county_no_data_centers",
+    "name": "Protect Warren County – No Data Centers",
+    "type": "group",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "high",
+    "community_weight": 1.6,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "warren_county_sheriffs_office",
+    "name": "Warren County Sheriff's Office",
+    "type": "page",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "medium",
+    "community_weight": 1.0,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "warren_county_fire_and_rescue",
+    "name": "Warren County Fire & Rescue",
+    "type": "page",
+    "region": "shenandoah_valley",
+    "url": "",
+    "priority": "medium",
+    "community_weight": 1.0,
+    "enabled": false,
+    "status": "REQUIRES_URL_VERIFICATION"
+  },
+  {
+    "id": "front_royal_police",
+    "name": "Front Royal Police Department",
+    "type": "page",
+    "region": "shenandoah_valley",
+    "url": "https://www.facebook.com/frontroyalpolice",
+    "priority": "high",
+    "community_weight": 1.0,
+    "enabled": true,
+    "status": "VERIFIED_PUBLIC"
+  },
+  {
+    "id": "front_royal_fire_ems_calls_and_police_incidents",
+    "name": "Front Royal & Warren Co Fire-Ems calls AND Police incidents.",
+    "type": "group",
+    "region": "shenandoah_valley",
+    "url": "https://www.facebook.com/groups/debfox/",
+    "priority": "high",
+    "community_weight": 1.6,
+    "enabled": true,
+    "status": "VERIFIED_PUBLIC"
+  }
+]
