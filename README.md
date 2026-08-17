@@ -2,8 +2,6 @@
 
 VA_PODCAST is a simple local media dashboard designed to answer: "What's worth talking about today?"
 
-The project is intentionally started as a GUI-first application. The goal is to establish the exact dashboard structure the future collection and ranking logic will feed.
-
 ## What this project includes
 
 - A Flask app that serves the dashboard locally
