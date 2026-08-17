@@ -11,15 +11,14 @@ This subsystem does exactly five things:
 5. saves it to `items.json`
 
 It does **not** rank, score, cluster, summarize, or write to `data.json`.
-That is the job of the future Topic Engine (not built yet). The GUI is
-untouched by this subsystem.
+That is the separate Topic Engine's job.
 
 ## Files
 
 - `crawler.py` — the whole collector. One file, no framework.
 - `sources.json` — the approved source list (see format below).
-- `items.json` — normalized evidence, written by the crawler. Grows over
-  time; existing items are never deleted, only refreshed on re-collection.
+- `items.json` — normalized active evidence, written atomically by the crawler
+  and retained for a rolling 14 days.
 - `README.md` — this file.
 
 ## Running it
@@ -29,6 +28,7 @@ python web_crawlers/crawler.py                    # collect from all enabled sou
 python web_crawlers/crawler.py --source royal_examiner   # collect from one source
 python web_crawlers/crawler.py --audit             # check source health, save nothing
 python web_crawlers/crawler.py --window-hours 72    # widen the collection window
+python web_crawlers/crawler.py --max-workers 4      # lower the concurrency limit
 ```
 
 ## Source list format (`sources.json`)
@@ -76,6 +76,8 @@ is disabled here with a note, not forced.
   "text": "...",
   "published_at": "2026-08-16T12:00:00+00:00",
   "collected_at": "2026-08-16T18:00:00+00:00",
+  "first_seen_at": "2026-08-16T18:00:00+00:00",
+  "last_seen_at": "2026-08-17T13:00:00+00:00",
   "author": null,
   "category_hint": null
 }
@@ -86,34 +88,55 @@ No ranking fields, no keyword fields, no LLM fields. That comes later.
 ## Identity / deduplication
 
 `item_id` is derived from the source id plus a hash of the canonicalized
-article URL (query string and trailing slash stripped). One article exists
-once in `items.json` no matter how many times the crawler runs. On a
-re-run, an unchanged item's `collected_at` is refreshed but no duplicate
-record is created; if the source changed the title/text, that is updated in
-place.
+article URL. Fragments, trailing slashes, and known analytics parameters are
+removed; meaningful query parameters are retained because government systems
+such as Granicus use values like `event_id` and `clip_id` to distinguish
+meetings. One article exists once in `items.json` no matter how many times the
+crawler runs. On a re-run,
+`published_at`, `first_seen_at`, and the compatibility field `collected_at`
+remain unchanged; only `last_seen_at` advances. If the source changes the
+title/text, that content is updated in place. This prevents an old undated
+page from looking new simply because it was crawled again. Pre-migration
+records containing only `collected_at` remain supported.
 
 ## Collection window
 
-`WINDOW_HOURS = 24` in `crawler.py` is the single constant controlling how
-far back the crawler looks for new items. It can be overridden per run with
-`--window-hours` (used during validation for sparse sources, e.g. `--window-
-hours 72`). Items without a parsable date are always kept rather than
-silently dropped. This is deliberately simple — no timeline filtering logic
-beyond this one cutoff.
+`WINDOW_HOURS = 336` in `crawler.py` lets a first crawl populate as much of
+the 14-day view as each source exposes. It can be overridden per run with
+`--window-hours`. Items without a parsable publication date are collected,
+then age from their immutable `first_seen_at` value. RSS/Atom/JSON entries are
+date-filtered before the per-source accepted-item safety cap is applied, so old
+feed entries cannot hide newer in-window material farther down the feed.
+
+After at least one source succeeds, the merged store is pruned to a rolling
+14 days using `published_at`, otherwise `first_seen_at`, otherwise the legacy
+`collected_at`. `last_seen_at` is never used for freshness or retention. If
+every source fails, the existing file is left completely untouched. The app
+also supplies a `commit_predicate` source-health gate; when it rejects the
+collection, merge, pruning, and saving are all skipped byte-for-byte.
+
+## Concurrency and progress
+
+Enabled sources are fetched concurrently with a bounded pool (eight workers
+by default). Each source remains isolated, so one failure cannot cancel the
+others. Results are merged once in configured source order after all fetches
+finish, then saved once with an atomic file replacement.
+
+Library callers can pass `progress_callback` to `run_crawl`; it is called as
+each source completes with cumulative total/completed/succeeded/failed counts,
+the current source and region, result status, item count, and duration. A
+callback error is logged but cannot fail the crawl. The final summary includes
+the same overall counts plus per-region attempted/succeeded/failed counts.
 
 ## Relationship to `scrape_local_sources.py`
 
-`scrape_local_sources.py` (repo root) was an earlier, ad hoc script that
-scraped a couple of pages and hand-wrote demo-adjacent topic cards directly
-into `data.json`'s shape. It is left untouched. `web_crawlers/` is the
-subsystem that is meant to take over real evidence collection going
-forward; `scrape_local_sources.py` is not deleted or modified by this
-mission, but its future role is expected to be replaced once the Topic
-Engine (which will read `web_crawlers/items.json`) exists.
+`scrape_local_sources.py` (repo root) is an earlier, ad hoc script that
+scraped a couple of pages and wrote topic-card-shaped data directly. It is
+left untouched for history; the current production path is this evidence
+collector followed by `topic_engine/engine.py`.
 
 ## What's deliberately not here
 
 No ranking, no Top 3, no "Why It's Trending", no "Covered By" generation,
-no LLM calls, no database, no scheduler. Those all belong to Topic Engine
-V1, which is a separate, future mission that reads this module's
-`items.json` (plus `facebook/posts.json`) as input.
+no LLM calls, no database, no scheduler. Ranking and presentation belong to
+the separate Topic Engine, which reads this module's `items.json` output.

@@ -1,6 +1,6 @@
 # topic_engine
 
-Topic Engine V1: turns collected web evidence into the Top 3 topics per
+Topic Engine V2: turns collected web evidence into the Top 3 topics per
 GUI category, written into the existing `data.json` contract.
 
 ```
@@ -9,13 +9,14 @@ web_crawlers/items.json  →  topic_engine/engine.py  →  data.json  →  GUI
 
 No LLM, no database, no scheduler, no embeddings. Every decision below is a
 small, deterministic rule. Facebook (`facebook/posts.json`) is not read at
-all in V1 — it's paused, and the engine runs fine without it.
+all in V2 — it's paused, and the engine runs fine without it.
 
 ## Running it
 
 ```bash
 python topic_engine/engine.py              # discover, rank, write data.json
 python topic_engine/engine.py --dry-run     # same, but data.json is not touched
+python topic_engine/engine.py --timeframe 14d
 ```
 
 Both print a per-category summary: how many items were read, how many
@@ -27,22 +28,48 @@ the selected Top 3 (title, heat, source count) per category.
 1. **Load evidence** — `web_crawlers/items.json`. Items from source ids
    currently marked disabled in `web_crawlers/sources.json` remain
    archived but are excluded from topic selection.
-2. **Regional and local relevance filters** — see below. The same pipeline
+2. **Timeframe filter** — use the stable evidence timestamp (`published_at`,
+   else `first_seen_at`, else legacy `collected_at`) to select Today, 24
+   Hours, 3 Days, 7 Days, or 14 Days. This happens before clustering, so
+   mention/source counts and ranks belong to the selected window.
+3. **Regional, local-relevance, and subject filters** — see below. The same pipeline
    runs per region; items that fail that region's geography check are
    dropped before topic discovery. This keeps national material and
    generic syndicated columns from crowding out real local stories.
-3. **Topic discovery (clustering)** — group items whose titles clearly
+4. **Topic discovery (clustering)** — group items whose titles clearly
    describe the same underlying story into one topic.
-4. **Category assignment** — simple keyword scoring against each item's
+5. **Category assignment** — simple keyword scoring against each item's
    title + text.
-5. **Ranking** — an internal score (never shown in the GUI or written to
+6. **Ranking** — an internal score (never shown in the GUI or written to
    `data.json`) orders topics within each category.
-6. **Heat labels** — RED HOT / HOT / WARM / WATCH, from the same facts used
+7. **Heat labels** — RED HOT / HOT / WARM / WATCH, from the same facts used
    for ranking.
-7. **Top 3 per category** — fewer if fewer than 3 meaningful topics exist.
+8. **Top 3 per category** — fewer if fewer than 3 meaningful topics exist.
    No filler is ever invented.
-8. **Write `data.json`** — each configured region gets the same category
+9. **Write `data.json`** — each configured region gets the same category
    contract, with empty lists only when no evidence qualifies.
+
+## Timeframes and timestamp stability
+
+`run_pipeline(items_path=None, sources_path=None, timeframe="today",
+now=None)` accepts these ordered keys from `config.TIMEFRAMES`:
+
+| key | meaning |
+|---|---|
+| `today` | Since midnight today in `America/New_York` (calendar-based, including DST) |
+| `24h` | Rolling 24 hours |
+| `3d` | Rolling 72 hours |
+| `7d` | Rolling 168 hours |
+| `14d` | Rolling 336 hours |
+
+Both the cutoff and current-time boundaries are inclusive. Future-dated and
+undated records are omitted. Pass one timezone-aware `now` value when
+building several views so every boundary and freshness calculation uses the
+same clock; naive injected values are treated as UTC. `SUPPORTED_TIMEFRAMES`
+and `get_timeframe_metadata()` are the app-facing tab contract.
+
+Freshness never uses `last_seen_at`. Re-crawling an old undated page updates
+its observation history without making the story new again.
 
 ## Local relevance
 
@@ -67,6 +94,16 @@ Everything else — recipes, generic career-advice columns, travel pieces,
 national wire stories that happen to run on a local outlet's feed, WHSV
 segments about places outside the Valley — is dropped before topic
 discovery even starts.
+
+After local relevance, a conservative title/category classifier also removes
+approved low-value primary subjects: road-vehicle accidents, routine
+crime-blotter or individual-arrest items, non-serious generic weather
+forecasts, sports scores/recaps, obituaries, routine roadwork notices,
+property listings, generic syndicated advice/recipes, and sponsored content.
+Broader road-safety policy, infrastructure failures, serious weather alerts,
+public-official/systemic cases, housing/development reporting, and civic
+actions remain eligible. `primary_subject_exclusion_reason()` returns a
+stable reason code so hunt diagnostics can explain what was discarded.
 
 **Boilerplate stripping**: found live, and worth calling out — a WordPress
 auto-footer ("The post X appeared first on Y") and a syndication CTA ("For
@@ -102,7 +139,7 @@ Switching to connected components fixed it: all three now correctly become
 one RED HOT topic with 3 independent sources.
 
 No embeddings, no LLM, only title text is compared (article bodies are
-noisier and not used for clustering in V1).
+noisier and not used for clustering in V2).
 
 ## One item = one mention
 
@@ -123,7 +160,27 @@ shown in the GUI:
 | freshness | today = 3, this week = 2, this month = 1, older = 0 |
 | locality strength | 2 if any evidence item is from a hyperlocal/government source, else 1 (everything reaching this point already passed the relevance filter) |
 | significance (permanent watch priorities) | +2 if a government source is present or the topic matches a permanent watch term |
-| future Facebook/community signal | always 0 in V1 — `facebook_signal_for_topic()` is the documented extension point; Facebook is paused and not read at all this mission |
+| civic priority | up to +8: +5 for a completed formal action, +4 for an upcoming vote/public hearing/scheduled action, and +3 for land use; final land decisions stack to the +8 cap |
+| future Facebook/community signal | always 0 in V2 — `facebook_signal_for_topic()` is the documented extension point; Facebook is paused and not read at all in this version |
+
+`compute_score_breakdown()` exposes every normal component, the normal-score
+subtotal, the capped civic boost, and the total for deterministic tests and
+debugging. The numeric score remains an internal sorting value.
+
+### Civic action and land-use priority
+
+The civic boost is scoped to Town/City Councils, Planning Commissions,
+Boards of Supervisors/County Boards, and Boards of Zoning Appeals. General
+votes receive the action boost; rezoning, land use, development,
+subdivisions, data centers, annexations, easements, land purchases, and
+housing projects add the land-use boost.
+
+Each output topic always includes `civic_action` (a normalized string or
+`null`) and `land_use` (boolean). Supported action strings are `PASSED`,
+`APPROVED`, `ADOPTED`, `DENIED`, `DEFERRED`, `VOTED`, `UPCOMING VOTE`,
+`PUBLIC HEARING`, `SCHEDULED ACTION`, and `LAND USE`. Future, negated, and
+conditional wording is checked conservatively so an expected or not-yet
+approved result is never presented as a completed decision.
 
 ## Heat labels
 
@@ -178,18 +235,15 @@ category lists.
   supporting evidence item.
 - **summary** — the longest (most complete) supporting item's text,
   boilerplate-stripped, truncated to ~260 characters at a word boundary. No
-  synthesis — this is meant to be improved by a limited LLM pass on
-  finalists later, not in V1.
+  synthesis — this may be improved by a limited LLM pass on finalists later,
+  but V2 remains deterministic.
 
 ## Data written
 
-Only `shenandoah_valley` gets real topics. `northern_virginia` is written
-as `{category: [] for category in CATEGORIES}` — there is no Northern
-Virginia crawler yet, so nothing is invented for it. Two small,
-backward-compatible fields are added to each topic beyond the pre-existing
-schema: `heat` and `why_trending` (the GUI template already guarded
-`why_trending` with `is defined` before this mission; `heat` gets a small
-badge in `templates/index.html` / `static/style.css`).
+Every configured region is produced by the same evidence pipeline. A
+single-view result includes top-level `updated_at` and `timeframe`, followed
+by each region's category mapping. Topic rows retain the existing contract
+and add `heat`, `why_trending`, `civic_action`, and `land_use`.
 
 ## Config
 

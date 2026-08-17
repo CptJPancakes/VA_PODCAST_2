@@ -136,7 +136,7 @@ def test_local_evidence_beats_unrelated_regional_material(tmp_path):
     assert engine.is_locally_relevant(items[1]) is False
 
     path = write_items(tmp_path, items)
-    data, _, stats = engine.run_pipeline(path)
+    data, _, stats = engine.run_pipeline(path, timeframe="14d")
     assert stats["locally_relevant_items"] == 1
     all_titles = [t["title"] for cat in data["shenandoah_valley"].values() for t in cat]
     assert any("back to class" in t for t in all_titles)
@@ -255,7 +255,7 @@ def test_top_3_maximum_per_category(tmp_path):
                        title, text=text, hours_ago=i)
         )
     path = write_items(tmp_path, items)
-    data, _, stats = engine.run_pipeline(path)
+    data, _, stats = engine.run_pipeline(path, timeframe="14d")
 
     assert stats["topics_discovered"] == 5  # all five stayed distinct topics
     community = data["shenandoah_valley"]["community"]
@@ -266,7 +266,7 @@ def test_top_3_maximum_per_category(tmp_path):
 def test_fewer_than_3_allowed_no_fake_filler(tmp_path):
     items = [make_item("a", "front_royal_town_news", "Town of Front Royal - News Flash", GOV, "Single town notice")]
     path = write_items(tmp_path, items)
-    data, _, _ = engine.run_pipeline(path)
+    data, _, _ = engine.run_pipeline(path, timeframe="14d")
     total_selected = sum(len(v) for v in data["shenandoah_valley"].values())
     assert total_selected == 1
 
@@ -283,7 +283,7 @@ def test_covered_by_fields_only_contain_real_supporting_sources(tmp_path):
                    url="https://theriver953.com/b", hours_ago=2),
     ]
     path = write_items(tmp_path, items)
-    data, _, _ = engine.run_pipeline(path)
+    data, _, _ = engine.run_pipeline(path, timeframe="14d")
     topic = next(t for cat in data["shenandoah_valley"].values() for t in cat if t["mentions"] == 2)
     assert set(topic["source_names"]) == {"Royal Examiner", "The River 95.3"}
     assert set(topic["article_links"]) == {"https://royalexaminer.com/a", "https://theriver953.com/b"}
@@ -297,7 +297,7 @@ def test_covered_by_fields_only_contain_real_supporting_sources(tmp_path):
 def test_northern_virginia_remains_empty_without_evidence(tmp_path):
     items = [make_item("a", "front_royal_town_news", "Town of Front Royal - News Flash", GOV, "Town notice")]
     path = write_items(tmp_path, items)
-    data, _, _ = engine.run_pipeline(path)
+    data, _, _ = engine.run_pipeline(path, timeframe="14d")
     assert set(data["northern_virginia"].keys()) == set(config.CATEGORIES)
     assert all(data["northern_virginia"][cat] == [] for cat in config.CATEGORIES)
 
@@ -315,7 +315,7 @@ def test_engine_runs_fine_without_any_facebook_data(tmp_path):
 
     items = [make_item("a", "front_royal_town_news", "Town of Front Royal - News Flash", GOV, "Town notice")]
     path = write_items(tmp_path, items)
-    data, _, stats = engine.run_pipeline(path)
+    data, _, stats = engine.run_pipeline(path, timeframe="14d")
     assert stats["items_read"] == 1
     assert sum(len(v) for v in data["shenandoah_valley"].values()) == 1
 
@@ -349,7 +349,7 @@ def test_pipeline_excludes_evidence_from_explicitly_disabled_sources(tmp_path):
         encoding="utf-8",
     )
 
-    data, _, stats = engine.run_pipeline(items_path, sources_path)
+    data, _, stats = engine.run_pipeline(items_path, sources_path, timeframe="14d")
 
     titles = [
         topic["title"]
@@ -373,8 +373,8 @@ def test_output_is_deterministic_across_runs(tmp_path):
         make_item("c", "front_royal_town_news", "Town of Front Royal - News Flash", GOV, "Town notice about roads", hours_ago=1),
     ]
     path = write_items(tmp_path, items)
-    data1, _, _ = engine.run_pipeline(path)
-    data2, _, _ = engine.run_pipeline(path)
+    data1, _, _ = engine.run_pipeline(path, timeframe="14d")
+    data2, _, _ = engine.run_pipeline(path, timeframe="14d")
     data1.pop("updated_at")
     data2.pop("updated_at")
     assert data1 == data2
@@ -390,9 +390,10 @@ def test_output_matches_existing_gui_data_contract(tmp_path):
         make_item("b", "front_royal_town_news", "Town of Front Royal - News Flash", GOV, "Town council notice", hours_ago=1),
     ]
     path = write_items(tmp_path, items)
-    data, _, _ = engine.run_pipeline(path)
+    data, _, _ = engine.run_pipeline(path, timeframe="14d")
 
-    assert set(data.keys()) == {"updated_at", "shenandoah_valley", "northern_virginia"}
+    assert set(data.keys()) == {"updated_at", "timeframe", "shenandoah_valley", "northern_virginia"}
+    assert data["timeframe"] == "14d"
     assert datetime.fromisoformat(data["updated_at"]).tzinfo is not None
     for region in ("shenandoah_valley", "northern_virginia"):
         assert set(data[region].keys()) == set(config.CATEGORIES)
@@ -400,7 +401,7 @@ def test_output_matches_existing_gui_data_contract(tmp_path):
     required_fields = {
         "rank", "title", "summary", "mentions", "source_count", "latest_activity",
         "source_names", "trend", "first_detected", "related_keywords",
-        "article_links", "details", "heat", "why_trending",
+        "article_links", "details", "heat", "why_trending", "civic_action", "land_use",
     }
     any_topic = next(t for cat in data["shenandoah_valley"].values() for t in cat)
     assert required_fields <= set(any_topic.keys())
@@ -452,7 +453,7 @@ def test_topic_engine_consumes_nova_evidence_without_breaking_shenandoah(tmp_pat
                    hours_ago=2, region="northern_virginia"),
     ]
     path = write_items(tmp_path, items)
-    data, _, stats = engine.run_pipeline(path)
+    data, _, stats = engine.run_pipeline(path, timeframe="14d")
 
     assert stats["by_region"]["shenandoah_valley"]["regional_items"] == 2
     assert stats["by_region"]["northern_virginia"]["regional_items"] == 2
@@ -477,7 +478,7 @@ def test_shenandoah_items_do_not_leak_into_northern_virginia_output(tmp_path):
                    "Front Royal downtown event draws crowd", hours_ago=1, region="shenandoah_valley"),
     ]
     path = write_items(tmp_path, items)
-    data, _, _ = engine.run_pipeline(path)
+    data, _, _ = engine.run_pipeline(path, timeframe="14d")
     nv_titles = [t["title"] for cat in data["northern_virginia"].values() for t in cat]
     assert "Front Royal downtown event draws crowd" not in nv_titles
     assert sum(len(v) for v in data["northern_virginia"].values()) == 0
@@ -489,7 +490,7 @@ def test_northern_virginia_items_do_not_leak_into_shenandoah_output(tmp_path):
                    "Arlington restaurant opens downtown", hours_ago=1, region="northern_virginia"),
     ]
     path = write_items(tmp_path, items)
-    data, _, _ = engine.run_pipeline(path)
+    data, _, _ = engine.run_pipeline(path, timeframe="14d")
     sv_titles = [t["title"] for cat in data["shenandoah_valley"].values() for t in cat]
     assert "Arlington restaurant opens downtown" not in sv_titles
     assert sum(len(v) for v in data["shenandoah_valley"].values()) == 0
@@ -502,7 +503,7 @@ def test_government_source_details_text_is_region_agnostic(tmp_path):
                    text="The county finalized a land purchase.", hours_ago=1, region="northern_virginia"),
     ]
     path = write_items(tmp_path, items)
-    data, _, _ = engine.run_pipeline(path)
+    data, _, _ = engine.run_pipeline(path, timeframe="14d")
     topic = next(t for cat in data["northern_virginia"].values() for t in cat)
     assert "Front Royal" not in topic["details"]
     assert "Warren County" not in topic["details"]
@@ -516,11 +517,11 @@ def test_northern_virginia_gui_data_contract_valid(tmp_path):
                    hours_ago=1, region="northern_virginia"),
     ]
     path = write_items(tmp_path, items)
-    data, _, _ = engine.run_pipeline(path)
+    data, _, _ = engine.run_pipeline(path, timeframe="14d")
     required_fields = {
         "rank", "title", "summary", "mentions", "source_count", "latest_activity",
         "source_names", "trend", "first_detected", "related_keywords",
-        "article_links", "details", "heat", "why_trending",
+        "article_links", "details", "heat", "why_trending", "civic_action", "land_use",
     }
     topic = next(t for cat in data["northern_virginia"].values() for t in cat)
     assert required_fields <= set(topic.keys())
@@ -709,3 +710,330 @@ def test_genuine_commentary_about_local_subject_remains_eligible():
         category_hint="Commentary", region="northern_virginia",
     )
     assert engine.is_locally_relevant(item) is True  # place name is in the title, independent of the byline
+
+
+# ---------------------------------------------------------------------------
+# Timeframes V2: stable timestamps and pre-cluster filtering
+# ---------------------------------------------------------------------------
+
+FIXED_NOW = datetime(2026, 8, 17, 16, 0, tzinfo=timezone.utc)  # noon Eastern
+
+
+def set_item_times(item, *, published_at=None, first_seen_at=None, collected_at=None, last_seen_at=None):
+    item["published_at"] = published_at
+    item["first_seen_at"] = first_seen_at
+    item["collected_at"] = collected_at
+    item["last_seen_at"] = last_seen_at
+    return item
+
+
+def fixed_item(item_id, title, timestamp, **overrides):
+    item = make_item(
+        item_id,
+        overrides.pop("source_id", "front_royal_town_news"),
+        overrides.pop("source_name", "Town of Front Royal - News Flash"),
+        overrides.pop("source_type", GOV),
+        title,
+        **overrides,
+    )
+    return set_item_times(item, published_at=timestamp.isoformat(), collected_at=timestamp.isoformat())
+
+
+def test_supported_timeframe_metadata_has_canonical_order_and_durations():
+    assert engine.SUPPORTED_TIMEFRAMES == ("today", "24h", "3d", "7d", "14d")
+    metadata = engine.get_timeframe_metadata()
+    assert [entry["key"] for entry in metadata] == list(engine.SUPPORTED_TIMEFRAMES)
+    assert [entry["label"] for entry in metadata] == [
+        "Today", "24 Hours", "3 Days", "7 Days", "14 Days",
+    ]
+    assert [entry["hours"] for entry in metadata] == [None, 24, 72, 168, 336]
+
+
+def test_today_uses_eastern_calendar_midnight_not_rolling_24_hours():
+    just_before_midnight = fixed_item(
+        "before", "Front Royal prior evening update", datetime(2026, 8, 17, 3, 59, 59, tzinfo=timezone.utc)
+    )
+    at_midnight = fixed_item(
+        "at", "Front Royal midnight update", datetime(2026, 8, 17, 4, 0, tzinfo=timezone.utc)
+    )
+    morning = fixed_item(
+        "morning", "Front Royal morning update", datetime(2026, 8, 17, 12, 0, tzinfo=timezone.utc)
+    )
+
+    today_ids = {
+        item["item_id"]
+        for item in engine.filter_items_by_timeframe(
+            [just_before_midnight, at_midnight, morning], "today", now=FIXED_NOW
+        )
+    }
+    rolling_ids = {
+        item["item_id"]
+        for item in engine.filter_items_by_timeframe(
+            [just_before_midnight, at_midnight, morning], "24h", now=FIXED_NOW
+        )
+    }
+
+    assert today_ids == {"at", "morning"}
+    assert rolling_ids == {"before", "at", "morning"}
+
+
+@pytest.mark.parametrize(
+    ("timeframe", "hours"),
+    [("24h", 24), ("3d", 72), ("7d", 168), ("14d", 336)],
+)
+def test_rolling_timeframe_boundaries_are_inclusive(timeframe, hours):
+    at_cutoff = fixed_item("at", "Front Royal cutoff item", FIXED_NOW - timedelta(hours=hours))
+    too_old = fixed_item(
+        "old", "Front Royal older item", FIXED_NOW - timedelta(hours=hours, seconds=1)
+    )
+    future = fixed_item("future", "Front Royal future item", FIXED_NOW + timedelta(seconds=1))
+
+    kept = engine.filter_items_by_timeframe([at_cutoff, too_old, future], timeframe, now=FIXED_NOW)
+
+    assert [item["item_id"] for item in kept] == ["at"]
+
+
+def test_today_cutoff_respects_eastern_dst_offset_at_midnight():
+    assert engine.timeframe_cutoff(
+        "today", datetime(2026, 3, 8, 16, 0, tzinfo=timezone.utc)
+    ) == datetime(2026, 3, 8, 5, 0, tzinfo=timezone.utc)
+    assert engine.timeframe_cutoff(
+        "today", datetime(2026, 11, 1, 17, 0, tzinfo=timezone.utc)
+    ) == datetime(2026, 11, 1, 4, 0, tzinfo=timezone.utc)
+
+
+def test_item_datetime_prefers_publication_then_first_seen_then_legacy_collected():
+    item = set_item_times(
+        make_item("a", "source", "Source", "news", "Front Royal item"),
+        published_at="2026-08-10T10:00:00+00:00",
+        first_seen_at="2026-08-11T10:00:00+00:00",
+        collected_at="2026-08-12T10:00:00+00:00",
+        last_seen_at="2026-08-17T10:00:00+00:00",
+    )
+    assert engine.item_datetime(item) == datetime(2026, 8, 10, 10, 0, tzinfo=timezone.utc)
+
+    item["published_at"] = None
+    assert engine.item_datetime(item) == datetime(2026, 8, 11, 10, 0, tzinfo=timezone.utc)
+
+    item["first_seen_at"] = None
+    assert engine.item_datetime(item) == datetime(2026, 8, 12, 10, 0, tzinfo=timezone.utc)
+
+    item["collected_at"] = None
+    assert engine.item_datetime(item) is None  # last_seen_at must never refresh an old story
+
+
+def test_invalid_publication_timestamp_falls_back_to_first_seen():
+    item = set_item_times(
+        make_item("a", "source", "Source", "news", "Front Royal item"),
+        published_at="not-a-date",
+        first_seen_at="2026-08-17T10:00:00Z",
+        collected_at="2026-08-16T10:00:00Z",
+    )
+    assert engine.item_datetime(item) == datetime(2026, 8, 17, 10, 0, tzinfo=timezone.utc)
+
+
+def test_pipeline_filters_evidence_before_clustering_and_ranking(tmp_path):
+    inside = fixed_item(
+        "inside", "Front Royal council approves zoning plan", FIXED_NOW - timedelta(hours=2)
+    )
+    outside = fixed_item(
+        "outside", "Front Royal council approves zoning plan", FIXED_NOW - timedelta(hours=30)
+    )
+    path = write_items(tmp_path, [inside, outside])
+
+    day_data, _, day_stats = engine.run_pipeline(path, timeframe="24h", now=FIXED_NOW)
+    three_day_data, _, _ = engine.run_pipeline(path, timeframe="3d", now=FIXED_NOW)
+
+    day_topic = next(topic for topics in day_data["shenandoah_valley"].values() for topic in topics)
+    three_day_topic = next(topic for topics in three_day_data["shenandoah_valley"].values() for topic in topics)
+    assert day_stats["timeframe_items"] == 1
+    assert day_topic["mentions"] == 1
+    assert three_day_topic["mentions"] == 2
+    assert day_data["updated_at"] == FIXED_NOW.isoformat(timespec="seconds")
+
+
+def test_unknown_timeframe_is_rejected_clearly():
+    with pytest.raises(ValueError, match="unsupported timeframe"):
+        engine.filter_items_by_timeframe([], "30d", now=FIXED_NOW)
+
+
+# ---------------------------------------------------------------------------
+# Approved primary-subject exclusions
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    ("title", "category_hint", "expected_reason"),
+    [
+        ("Two hurt in Front Royal car crash", None, "vehicle_accident"),
+        ("Traffic delays after crash on I-66 in Fairfax", None, "vehicle_accident"),
+        ("Pedestrian struck by vehicle in Fairfax", None, "vehicle_accident"),
+        ("Warren County police blotter for August 17", None, "routine_crime"),
+        ("Front Royal man arrested after shoplifting report", None, "individual_arrest"),
+        ("Front Royal weekend weather forecast calls for sunshine", "Weather", "generic_weather_forecast"),
+        ("Front Royal football: Wildcats beat Tigers 28-14", "Sports", "sports_score_or_recap"),
+        ("Obituary: Jane Doe of Front Royal", "Obituaries", "obituary"),
+        ("Lane closures for paving announced in Front Royal", None, "routine_roadwork"),
+        ("Front Royal home of the week listed for $850,000", None, "property_listing"),
+        ("Recipe: easy summer chicken", "Recipes", "generic_advice_or_recipe"),
+        ("Your Front Royal customer is reading this", "Sponsored", "sponsored_content"),
+    ],
+)
+def test_approved_primary_subject_exclusions(title, category_hint, expected_reason):
+    item = make_item(
+        "x", "royal_examiner", "Royal Examiner", "news", title,
+        category_hint=category_hint,
+    )
+    assert engine.primary_subject_exclusion_reason(item) == expected_reason
+
+
+@pytest.mark.parametrize(
+    ("title", "category_hint"),
+    [
+        ("Front Royal adopts Vision Zero safety plan after rise in crashes", None),
+        ("Three injured in Smith Mountain Lake boat crash", None),
+        ("Tornado warning issued for Warren County", "Weather"),
+        ("Weather alert: flood watches issued for Arlington", "Weather"),
+        ("Town Council approves bridge repair funding in Front Royal", None),
+        ("Planning Commission public hearing on Front Royal housing development", None),
+        ("Warren County funds new high school football field", "Sports"),
+        ("How to comment on Front Royal's rezoning proposal", "Advice"),
+    ],
+)
+def test_exclusion_rules_preserve_broader_local_policy_and_safety_stories(title, category_hint):
+    item = make_item(
+        "x", "royal_examiner", "Royal Examiner", "news", title,
+        category_hint=category_hint,
+    )
+    assert engine.primary_subject_exclusion_reason(item) is None
+
+
+def test_excluded_subjects_are_removed_before_topic_discovery(tmp_path):
+    crash = fixed_item(
+        "crash", "Two hurt in Front Royal car crash", FIXED_NOW - timedelta(hours=1),
+        source_id="royal_examiner", source_name="Royal Examiner", source_type="news",
+    )
+    council = fixed_item(
+        "council", "Town Council approves Front Royal zoning plan", FIXED_NOW - timedelta(hours=1)
+    )
+    path = write_items(tmp_path, [crash, council])
+
+    data, _, stats = engine.run_pipeline(path, timeframe="24h", now=FIXED_NOW)
+    titles = [topic["title"] for topics in data["shenandoah_valley"].values() for topic in topics]
+
+    assert stats["excluded_items"] == 1
+    assert stats["by_region"]["shenandoah_valley"]["exclusions_by_reason"] == {
+        "vehicle_accident": 1,
+    }
+    assert not any("crash" in title.lower() for title in titles)
+    assert any("zoning" in title.lower() for title in titles)
+
+
+# ---------------------------------------------------------------------------
+# Civic priority scoring and normalized badges
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    ("verb", "badge"),
+    [
+        ("passed", "PASSED"),
+        ("approved", "APPROVED"),
+        ("adopted", "ADOPTED"),
+        ("denied", "DENIED"),
+        ("voted on", "VOTED"),
+        ("deferred", "DEFERRED"),
+    ],
+)
+def test_formal_civic_actions_receive_plus_five_and_normalized_badge(verb, badge):
+    cluster = [
+        fixed_item(
+            "civic", f"Town Council {verb} the annual budget", FIXED_NOW - timedelta(hours=1)
+        )
+    ]
+    facts = engine.build_topic_facts(cluster, now=FIXED_NOW)
+
+    assert facts["civic_action"] == badge
+    assert facts["land_use"] is False
+    assert facts["civic_action_bonus"] == 5
+    assert facts["civic_priority_bonus"] == 5
+
+
+def test_final_land_use_action_stacks_to_capped_plus_eight():
+    cluster = [
+        fixed_item(
+            "land", "Planning Commission approved Front Royal rezoning request",
+            FIXED_NOW - timedelta(hours=1),
+        )
+    ]
+    facts = engine.build_topic_facts(cluster, now=FIXED_NOW)
+    breakdown = engine.compute_score_breakdown(facts)
+    output = engine.topic_to_output(facts, rank=1)
+
+    assert facts["civic_action"] == "APPROVED"
+    assert facts["land_use"] is True
+    assert facts["civic_action_bonus"] == 5
+    assert facts["civic_land_use_bonus"] == 3
+    assert facts["civic_priority_bonus"] == 8
+    assert breakdown["civic_priority"] == 8
+    assert breakdown["total_score"] == breakdown["normal_score"] + 8
+    assert output["civic_action"] == "APPROVED"
+    assert output["land_use"] is True
+
+
+@pytest.mark.parametrize(
+    ("title", "badge", "expected_bonus"),
+    [
+        ("Town Council will vote on Front Royal rezoning", "UPCOMING VOTE", 7),
+        ("Planning Commission public hearing on Front Royal subdivision", "PUBLIC HEARING", 7),
+        ("Board of Supervisors meeting agenda includes a Front Royal easement", "SCHEDULED ACTION", 7),
+        ("Board of Zoning Appeals reviews Front Royal land use", "LAND USE", 3),
+    ],
+)
+def test_upcoming_and_land_only_civic_priorities(title, badge, expected_bonus):
+    facts = engine.build_topic_facts(
+        [fixed_item("civic", title, FIXED_NOW - timedelta(hours=1))],
+        now=FIXED_NOW,
+    )
+    assert facts["civic_action"] == badge
+    assert facts["land_use"] is True
+    assert facts["civic_priority_bonus"] == expected_bonus
+
+
+def test_future_vote_language_does_not_claim_background_approval_as_result():
+    cluster = [
+        fixed_item(
+            "future",
+            "Town Council will vote on rezoning plan previously approved by Planning Commission",
+            FIXED_NOW - timedelta(hours=1),
+        )
+    ]
+    facts = engine.build_topic_facts(cluster, now=FIXED_NOW)
+    assert facts["civic_action"] == "UPCOMING VOTE"
+    assert facts["civic_priority_bonus"] == 7
+
+
+def test_negated_or_uncertain_civic_result_does_not_claim_final_action():
+    for phrase in (
+        "Town Council rezoning plan has not yet been approved",
+        "Town Council rezoning plan may be denied",
+        "Town Council rezoning plan is expected to be adopted",
+    ):
+        facts = engine.build_topic_facts(
+            [fixed_item("uncertain", phrase, FIXED_NOW - timedelta(hours=1))],
+            now=FIXED_NOW,
+        )
+        assert facts["civic_action"] == "LAND USE"
+        assert facts["civic_priority_bonus"] == 3
+
+
+def test_land_story_without_scoped_civic_body_gets_no_civic_bonus_or_badge():
+    cluster = [
+        fixed_item(
+            "private", "Developer announces Front Royal housing project",
+            FIXED_NOW - timedelta(hours=1),
+            source_id="royal_examiner", source_name="Royal Examiner", source_type="news",
+        )
+    ]
+    facts = engine.build_topic_facts(cluster, now=FIXED_NOW)
+    assert facts["civic_action"] is None
+    assert facts["land_use"] is False
+    assert facts["civic_priority_bonus"] == 0

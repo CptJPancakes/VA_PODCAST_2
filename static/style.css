@@ -33,6 +33,10 @@ body {
   color: var(--ink);
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 button,
 a {
   font: inherit;
@@ -165,6 +169,8 @@ h1 {
   background: var(--panel-alt);
   border: 1px solid var(--line);
   border-radius: 999px;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .timeframe {
@@ -372,6 +378,28 @@ h1 {
   color: var(--muted);
   line-height: 1.55;
   font-size: 0.96rem;
+}
+
+.civic-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -1px 0 10px;
+}
+
+.civic-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(216, 165, 75, 0.15);
+  border: 1px solid rgba(181, 103, 59, 0.32);
+  color: #80502d;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .why-trending-block {
@@ -601,6 +629,233 @@ h1 {
   text-align: center;
 }
 
+.hunt-modal {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.hunt-modal[hidden] {
+  display: none;
+}
+
+.hunt-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 27, 42, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.hunt-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 600px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  box-shadow: 0 28px 80px rgba(9, 21, 34, 0.28);
+  outline: none;
+}
+
+.hunt-dialog:focus-visible {
+  box-shadow: 0 28px 80px rgba(9, 21, 34, 0.28), 0 0 0 3px rgba(22, 58, 95, 0.22);
+}
+
+.hunt-dialog__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--panel-alt);
+  color: var(--muted);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.hunt-dialog__close:hover,
+.hunt-dialog__close:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}
+
+.hunt-eyebrow {
+  margin: 0 44px 6px 0;
+  color: var(--highlight);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.hunt-dialog h2 {
+  margin: 0 44px 8px 0;
+  color: var(--accent-strong);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.8rem;
+}
+
+.hunt-phase {
+  margin: 0;
+  min-height: 1.5em;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.hunt-current-source {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.hunt-progress-wrap {
+  margin: 24px 0 20px;
+}
+
+.hunt-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.hunt-progress {
+  display: block;
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  appearance: none;
+}
+
+.hunt-progress::-webkit-progress-bar {
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+
+.hunt-progress::-webkit-progress-value {
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #2f6b94);
+  transition: width 0.35s ease;
+}
+
+.hunt-progress::-moz-progress-bar {
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #2f6b94);
+}
+
+.hunt-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.hunt-stats > div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel-alt);
+}
+
+.hunt-stats dt {
+  color: var(--muted);
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hunt-stats dd {
+  margin: 5px 0 0;
+  color: var(--accent-strong);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.hunt-timing {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.hunt-timing strong {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.hunt-error {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid rgba(179, 38, 30, 0.25);
+  border-radius: var(--radius-sm);
+  background: rgba(179, 38, 30, 0.07);
+  color: var(--danger);
+  line-height: 1.5;
+}
+
+.hunt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.hunt-primary-button,
+.hunt-secondary-button {
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.hunt-primary-button {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+.hunt-secondary-button {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--accent);
+}
+
+.hunt-primary-button:hover,
+.hunt-primary-button:focus-visible {
+  background: var(--accent-strong);
+  outline: none;
+}
+
+.hunt-secondary-button:hover,
+.hunt-secondary-button:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  outline: none;
+}
+
 @media (max-width: 900px) {
   .category-grid {
     grid-template-columns: 1fr;
@@ -644,5 +899,36 @@ h1 {
 
   .stats-row {
     gap: 6px;
+  }
+
+  .hunt-modal {
+    padding: 10px;
+  }
+
+  .hunt-dialog {
+    max-height: calc(100vh - 20px);
+    padding: 22px 18px;
+  }
+
+  .hunt-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .hunt-actions {
+    flex-direction: column-reverse;
+  }
+
+  .hunt-primary-button,
+  .hunt-secondary-button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

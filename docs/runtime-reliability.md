@@ -35,12 +35,10 @@ guard were all already correct.
   rewriting `data.json` while the server was up produced no "Restarting
   with stat" log line and no dropped request — Werkzeug's default reloader
   only watches imported Python module files, not JSON data files.
-- **The GUI's Refresh button is not the bug.** It's a plain
-  `window.location.reload()` in `static/app.js` with no hardcoded host or
-  port anywhere in the frontend (checked `static/app.js` and
-  `templates/index.html`). It correctly reloads whatever page/port is
-  currently open — it only *looks* broken when the server underneath it
-  isn't running.
+- **The GUI has no hardcoded host or port.** Its **Go Hunting** control uses
+  relative `/api/refresh` and `/api/refresh/status` routes. After a successful
+  hunt, **View Updated Dashboard** reloads the current URL (including its
+  selected timeframe). It still depends on the local Flask process being up.
 
 ## Fix
 

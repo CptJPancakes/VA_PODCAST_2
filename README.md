@@ -5,7 +5,10 @@ VA_PODCAST is a simple local media dashboard designed to answer: "What's worth t
 ## What this project includes
 
 - A Flask app that serves the dashboard locally
-- A simple JSON data contract for future collection logic
+- A manually triggered, concurrent local-source crawler
+- Deterministic filtering, clustering, civic-priority ranking, and exclusions
+- Rolling Today, 24 Hours, 3 Days, 7 Days, and 14 Days views
+- A fail-safe **Go Hunting** workflow with live progress, elapsed time, and ETA
 - A responsive two-region dashboard for:
   - Shenandoah Valley
   - Northern Virginia
@@ -17,24 +20,12 @@ VA_PODCAST is a simple local media dashboard designed to answer: "What's worth t
   5. Food & Lifestyle
   6. Faith & Family
   7. News & Conversation
-- Demo data that is clearly labeled as demo content, not live information
+- A 14-day evidence store with canonical timestamps and URL deduplication
 
 ## What is intentionally not built yet
 
-This repo does not include:
-
-- crawlers
-- RSS readers
-- Facebook collection
-- topic ranking
-- keyword scoring
-- clustering
-- LLM workflow
-- article research
-- database schema
-- cloud or Docker infrastructure
-
-That work is intentionally deferred until the GUI contract is fully proven.
+This repo intentionally does not use an LLM, database, scheduler, cloud
+service, or Docker infrastructure. Facebook collection remains paused.
 
 ## Install dependencies
 
@@ -69,6 +60,11 @@ running — there is no background daemon or auto-restart yet. If the GUI
 becomes unreachable, check whether `python app.py` is still running before
 assuming something else is wrong.
 
+Starting the app never crawls. It immediately serves the last successful
+dashboard from `data.json`. A network crawl occurs only when **Go Hunting** is
+clicked. The progress dialog can be closed without stopping the background
+hunt; click **Hunt in Progress…** to reopen it.
+
 ## Current GUI architecture
 
 The app is deliberately simple:
@@ -77,45 +73,48 @@ The app is deliberately simple:
 - one JSON file as the data source
 - plain HTML
 - plain CSS
-- minimal vanilla JavaScript
+- vanilla JavaScript progress/status polling
 - no backend service layers or unnecessary abstractions
 
 ## JSON contract
 
-The dashboard expects this shape:
+After the first successful hunt, `data.json` uses one atomically published
+bundle containing every timeframe:
 
 ```json
 {
-  "updated_at": "2026-08-15T21:00:00+00:00",
-  "shenandoah_valley": {
-    "real_estate": [],
-    "community": [],
-    "business_economy": [],
-    "money_finance": [],
-    "food_lifestyle": [],
-    "faith_family": [],
-    "news_conversation": []
-  },
-  "northern_virginia": {
-    "real_estate": [],
-    "community": [],
-    "business_economy": [],
-    "money_finance": [],
-    "food_lifestyle": [],
-    "faith_family": [],
-    "news_conversation": []
+  "schema_version": 2,
+  "updated_at": "2026-08-17T21:00:00+00:00",
+  "default_range": "today",
+  "timeframes": {
+    "today": {
+      "shenandoah_valley": { "real_estate": [], "community": [] },
+      "northern_virginia": { "real_estate": [], "community": [] }
+    },
+    "24h": {},
+    "3d": {},
+    "7d": {},
+    "14d": {}
   }
 }
 ```
 
-Each topic item is expected to contain a title, summary, mention count, source count, latest activity, source names, and optional details for the expandable topic panel.
+The abbreviated region objects above also contain all seven categories listed
+earlier. The server continues to read the legacy root-level dashboard shape,
+so existing data remains usable until the first successful hunt. Each topic
+can include `civic_action` and `land_use`; the GUI renders those as priority
+badges.
 
-## Future direction
+## Manual hunt lifecycle
 
-The planned pipeline is:
+The hunt pipeline is:
 
 ```text
-online sources -> collection -> keywords/topics -> topic frequency -> related articles/posts -> write-up -> data.json -> GUI
+click Go Hunting -> collect sources concurrently -> source health gate -> build five views -> atomically replace data.json
 ```
 
-The GUI is built to reflect the eventual contract, but the intelligence pipeline itself is not part of this initial mission.
+At least half of attempted sources must succeed, and every attempted region
+must have a success. The collected results are staged until that check passes;
+an unhealthy hunt cannot prune or replace either `items.json` or the last
+successful dashboard. Timeframe buttons only select stored, pre-ranked views;
+they never start a crawl.

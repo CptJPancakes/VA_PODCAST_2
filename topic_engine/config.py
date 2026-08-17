@@ -32,6 +32,25 @@ CATEGORIES = [
 TOP_N_PER_CATEGORY = 3
 
 # ---------------------------------------------------------------------------
+# dashboard timeframes
+# ---------------------------------------------------------------------------
+
+# Kept as an insertion-ordered mapping so the API and GUI can share one
+# canonical tab order.  ``today`` is a calendar day in Eastern Time; all
+# other windows are rolling durations measured back from the supplied
+# clock.  ``hours`` is intentionally None for today because DST can make an
+# Eastern calendar day 23 or 25 hours long.
+EASTERN_TIMEZONE = "America/New_York"
+DEFAULT_TIMEFRAME = "today"
+TIMEFRAMES = {
+    "today": {"label": "Today", "kind": "calendar_day", "hours": None},
+    "24h": {"label": "24 Hours", "kind": "rolling", "hours": 24},
+    "3d": {"label": "3 Days", "kind": "rolling", "hours": 72},
+    "7d": {"label": "7 Days", "kind": "rolling", "hours": 168},
+    "14d": {"label": "14 Days", "kind": "rolling", "hours": 336},
+}
+
+# ---------------------------------------------------------------------------
 # local relevance
 # ---------------------------------------------------------------------------
 
@@ -168,6 +187,127 @@ EXCLUDED_CATEGORY_HINTS = {
     "partner content",
     "paid content",
 }
+
+# ---------------------------------------------------------------------------
+# approved primary-subject exclusions
+# ---------------------------------------------------------------------------
+
+# These tables drive a deliberately conservative classifier in engine.py.
+# A word appearing incidentally in an article body is not enough: strong
+# title/category evidence must show that the discarded material is the
+# story's primary subject.
+SERIOUS_WEATHER_TERMS = [
+    "warning", "warnings", "watch", "watches", "advisory", "advisories",
+    "alert", "alerts", "weather alert", "emergency", "severe", "tornado",
+    "flash flood", "flooding", "hurricane", "tropical storm", "ice storm",
+    "winter storm", "blizzard", "extreme heat", "dangerous heat",
+]
+
+WEATHER_FORECAST_TERMS = [
+    "weather forecast", "forecast", "weather outlook", "weekend weather",
+    "today's weather", "tomorrow's weather", "chance of rain",
+]
+
+SPORTS_CONTEXT_TERMS = [
+    "sports", "football", "basketball", "baseball", "softball", "soccer",
+    "lacrosse", "hockey", "volleyball", "wrestling", "game", "match",
+    "tournament", "playoff", "championship",
+]
+
+SPORTS_RECAP_TERMS = [
+    "recap", "final score", "game highlights", "defeats", "defeated",
+    "beats", "beat", "falls to", "fell to", "tops", "edges", "shuts out",
+    "wins over", "victory over",
+]
+
+ROADWORK_TERMS = [
+    "roadwork", "road work", "paving", "milling", "resurfacing",
+    "lane closure", "lane closures", "lanes closed", "road closure",
+    "road closures", "traffic shift", "traffic shifts",
+    "bridge maintenance", "utility work",
+]
+
+NON_ROUTINE_TRANSPORTATION_TERMS = [
+    "bridge collapse", "infrastructure failure", "transit change",
+    "safety plan", "safety improvements", "funding", "budget",
+    "approved", "adopted", "public hearing", "town council",
+    "city council", "board of supervisors", "planning commission",
+]
+
+PROPERTY_LISTING_TERMS = [
+    "home of the week", "house of the week", "property of the week",
+    "featured home", "just listed", "property listing", "real estate listing",
+    "homes for sale", "house for sale", "condo for sale", "land for sale",
+]
+
+GENERIC_ADVICE_TERMS = [
+    "ask amy", "dear abby", "hints from heloise", "horoscope", "recipe",
+    "cooking tips", "career advice", "relationship advice",
+]
+
+PUBLIC_OFFICIAL_TERMS = [
+    "mayor", "town manager", "city manager", "county administrator",
+    "council member", "councilmember", "supervisor", "school board member",
+    "public official", "police chief", "sheriff",
+]
+
+BROADER_CRIME_SIGNIFICANCE_TERMS = [
+    "public corruption", "election fraud", "systemic", "policy", "reform",
+    "crime trend", "crime statistics", "public safety plan",
+]
+
+VEHICLE_INCIDENT_POLICY_TERMS = [
+    "safety plan", "safety improvements", "road design", "redesign",
+    "vision zero", "policy", "legislation", "study", "crash data",
+    "crash statistics", "dangerous road", "dangerous intersection",
+    "infrastructure failure", "bridge collapse", "transit change",
+]
+
+# ---------------------------------------------------------------------------
+# civic / land-use priority
+# ---------------------------------------------------------------------------
+
+CIVIC_BODY_TERMS = [
+    "town council", "city council", "planning commission",
+    "board of supervisors", "board of zoning appeals",
+    "zoning appeals board", "county board", "bza",
+]
+
+CIVIC_LAND_USE_TERMS = [
+    "land use", "land purchase", "land acquisition", "land sale", "land",
+    "rezoning", "zoning", "development", "subdivision", "data center",
+    "annexation", "easement", "housing project", "housing development",
+    "planned unit development", "special use permit", "comprehensive plan",
+]
+
+# Decision-specific statuses are checked before generic VOTED.  Future vote
+# language is handled separately in engine.py and checked first, preventing
+# "will vote on a plan previously approved ..." from being mislabeled as a
+# completed decision.
+CIVIC_FINAL_ACTION_TERMS = [
+    ("DENIED", ["denied", "denies"]),
+    ("DEFERRED", ["deferred", "defers", "postponed", "tabled"]),
+    ("ADOPTED", ["adopted", "adopts"]),
+    ("APPROVED", ["approved", "approves"]),
+    ("PASSED", ["passed", "passes"]),
+    ("VOTED", ["voted"]),
+]
+
+CIVIC_UPCOMING_VOTE_TERMS = [
+    "will vote", "to vote", "set to vote", "scheduled to vote",
+    "vote scheduled", "scheduled vote", "upcoming vote",
+]
+
+CIVIC_PUBLIC_HEARING_TERMS = ["public hearing"]
+CIVIC_SCHEDULED_ACTION_TERMS = [
+    "scheduled action", "meeting agenda", "meeting agendas", "agenda", "agendas", "will consider",
+    "scheduled to consider", "set to consider", "on the agenda",
+]
+
+CIVIC_FINAL_ACTION_BONUS = 5
+CIVIC_UPCOMING_ACTION_BONUS = 4
+CIVIC_LAND_USE_BONUS = 3
+CIVIC_PRIORITY_BONUS_CAP = 8
 
 # Evidence Quality Cleanup V1 — Fix 4: category_hint values that mark
 # clearly generic, non-local-news content (movie/book reviews, etc). Found

@@ -15,23 +15,29 @@
             <h1></h1>
           </div>
           <div class="refresh-control">
-            <button id="refresh-button" class="refresh-button" type="button">Refresh</button>
-            <span id="refresh-status" class="refresh-status" hidden></span>
+            <button
+              id="refresh-button"
+              class="refresh-button"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="hunt-modal"
+            >Go Hunting</button>
+            <span id="refresh-status" class="refresh-status" aria-live="polite" hidden></span>
           </div>
         </div>
 
         <div class="header-bar">
           <div class="header-meta">
-            <span class="meta-item">{{ current_date }}</span>
             <span class="meta-item">Last Updated: {{ updated_at }}</span>
           </div>
 
           <div class="header-controls">
             <div class="timeframe-selector" aria-label="Timeframe selector">
-              <button class="timeframe active" type="button" data-range="today">Today</button>
-              <button class="timeframe" type="button" data-range="24h">24 Hours</button>
-              <button class="timeframe" type="button" data-range="3d">3 Days</button>
-              <button class="timeframe" type="button" data-range="7d">7 Days</button>
+              <button class="timeframe{% if active_range == 'today' %} active{% endif %}" type="button" data-range="today" aria-pressed="{{ 'true' if active_range == 'today' else 'false' }}">Today</button>
+              <button class="timeframe{% if active_range == '24h' %} active{% endif %}" type="button" data-range="24h" aria-pressed="{{ 'true' if active_range == '24h' else 'false' }}">24 Hours</button>
+              <button class="timeframe{% if active_range == '3d' %} active{% endif %}" type="button" data-range="3d" aria-pressed="{{ 'true' if active_range == '3d' else 'false' }}">3 Days</button>
+              <button class="timeframe{% if active_range == '7d' %} active{% endif %}" type="button" data-range="7d" aria-pressed="{{ 'true' if active_range == '7d' else 'false' }}">7 Days</button>
+              <button class="timeframe{% if active_range == '14d' %} active{% endif %}" type="button" data-range="14d" aria-pressed="{{ 'true' if active_range == '14d' else 'false' }}">14 Days</button>
             </div>
           </div>
         </div>
@@ -65,6 +71,24 @@
                           {% endif %}
                         </div>
                         <h3>{{ topic.title }}</h3>
+                        {% if topic.civic_action is defined and topic.civic_action %}
+                        <div class="civic-badges" aria-label="Civic action">
+                          {% if topic.civic_action is string %}
+                            <span class="civic-badge">{{ topic.civic_action|replace('_', ' ') }}</span>
+                          {% else %}
+                            {% for action in topic.civic_action %}
+                              <span class="civic-badge">{{ action|replace('_', ' ') }}</span>
+                            {% endfor %}
+                          {% endif %}
+                          {% if topic.land_use is defined and topic.land_use and topic.civic_action != 'LAND USE' %}
+                            <span class="civic-badge">LAND USE</span>
+                          {% endif %}
+                        </div>
+                        {% elif topic.land_use is defined and topic.land_use %}
+                        <div class="civic-badges" aria-label="Civic action">
+                          <span class="civic-badge">LAND USE</span>
+                        </div>
+                        {% endif %}
                         <p class="summary">{{ topic.summary }}</p>
 
                         {% if topic.why_trending is defined %}
@@ -168,6 +192,24 @@
                             </div>
 
                             <h3>{{ topic.title }}</h3>
+                            {% if topic.civic_action is defined and topic.civic_action %}
+                            <div class="civic-badges" aria-label="Civic action">
+                              {% if topic.civic_action is string %}
+                                <span class="civic-badge">{{ topic.civic_action|replace('_', ' ') }}</span>
+                              {% else %}
+                                {% for action in topic.civic_action %}
+                                  <span class="civic-badge">{{ action|replace('_', ' ') }}</span>
+                                {% endfor %}
+                              {% endif %}
+                              {% if topic.land_use is defined and topic.land_use and topic.civic_action != 'LAND USE' %}
+                                <span class="civic-badge">LAND USE</span>
+                              {% endif %}
+                            </div>
+                            {% elif topic.land_use is defined and topic.land_use %}
+                            <div class="civic-badges" aria-label="Civic action">
+                              <span class="civic-badge">LAND USE</span>
+                            </div>
+                            {% endif %}
                             <p class="summary">{{ topic.summary }}</p>
 
                             {% if topic.why_trending is defined %}
@@ -237,6 +279,60 @@
           </section>
         {% endfor %}
       </main>
+    </div>
+
+    <div id="hunt-modal" class="hunt-modal" hidden>
+      <div class="hunt-modal__backdrop" data-hunt-close></div>
+      <section
+        id="hunt-dialog"
+        class="hunt-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="hunt-title"
+        aria-describedby="hunt-phase"
+        tabindex="-1"
+      >
+        <button id="hunt-dialog-close" class="hunt-dialog__close" type="button" aria-label="Close hunt progress">×</button>
+        <p class="hunt-eyebrow">LOCAL STORY SEARCH</p>
+        <h2 id="hunt-title">Going Hunting</h2>
+        <p id="hunt-phase" class="hunt-phase" aria-live="polite">Preparing to check local sources…</p>
+        <p id="hunt-current-source" class="hunt-current-source" hidden></p>
+
+        <div class="hunt-progress-wrap">
+          <div class="hunt-progress-labels">
+            <span id="hunt-progress-label">Starting…</span>
+            <span id="hunt-progress-percent">0%</span>
+          </div>
+          <progress id="hunt-progress" class="hunt-progress" max="100" value="0">0%</progress>
+        </div>
+
+        <dl class="hunt-stats">
+          <div>
+            <dt>Sources checked</dt>
+            <dd id="hunt-source-count">0 / —</dd>
+          </div>
+          <div>
+            <dt>Succeeded</dt>
+            <dd id="hunt-succeeded">0</dd>
+          </div>
+          <div>
+            <dt>Failed</dt>
+            <dd id="hunt-failed">0</dd>
+          </div>
+        </dl>
+
+        <div class="hunt-timing" aria-label="Hunt timing">
+          <span>Elapsed <strong id="hunt-elapsed">00:00</strong></span>
+          <span>Estimated remaining <strong id="hunt-eta">Calculating…</strong></span>
+        </div>
+
+        <div id="hunt-error" class="hunt-error" role="alert" hidden></div>
+
+        <div class="hunt-actions">
+          <button id="hunt-close-button" class="hunt-secondary-button" type="button">Keep Browsing</button>
+          <button id="hunt-view-button" class="hunt-primary-button" type="button" hidden>View Updated Dashboard</button>
+        </div>
+      </section>
     </div>
 
     <script src="{{ url_for('static', filename='app.js') }}"></script>
